@@ -6,7 +6,7 @@ L'application repose sur une **architecture microservices** robuste, entièremen
 
 ---
 
-## 🏗️ Architecture du Système
+## Architecture du Système
 
 Le système est découpé en services autonomes et hautement scalables :
 
@@ -51,7 +51,7 @@ Le système est découpé en services autonomes et hautement scalables :
 
 ---
 
-## 📂 Structure du Projet
+## Structure du Projet
 
 ```
 Gestion-bibliotheque/
@@ -87,7 +87,7 @@ Gestion-bibliotheque/
 
 ---
 
-## 🚀 Installation et Lancement
+## Installation et Lancement
 
 ### Prérequis
 * [Docker](https://www.docker.com/) et [Docker Compose](https://docs.docker.com/compose/) installés et démarrés sur votre machine.
@@ -108,7 +108,7 @@ Cette commande va :
 
 ### Accès à l'application
 Une fois les conteneurs démarrés, ouvrez votre navigateur et accédez à :
-👉 **`http://localhost:8085`**
+ **`http://localhost:8085`**
 
 ### Vérification du statut des services
 Vous pouvez inspecter l'état des conteneurs avec :
@@ -134,7 +134,7 @@ Le fichier [Jenkinsfile](file:///c:/Users/HP%20ELITEBOOK/Downloads/Gestion-bibli
 
 ---
 
-## 📄 Génération du Rapport PDF requis
+## Génération du Rapport PDF requis
 
 Un script Python automatisé [generate_report.py](file:///c:/Users/HP%20ELITEBOOK/Downloads/Gestion-bibliotheque/generate_report.py) est fourni pour compiler instantanément le rapport académique officiel du projet au format PDF.
 
