@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for Data Viz -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -164,6 +166,15 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Analytics Chart Card -->
+                    <div class="dashboard-card chart-card">
+                        <div class="card-header">
+                            <h2>Répartition des Emprunts</h2>
+                        </div>
+                        <div class="card-body" style="position: relative; height:250px; width:100%; display:flex; justify-content:center; align-items:center;">
+                            <canvas id="loansChart"></canvas>
+                        </div>
+                    </div>
                     <!-- Recent Activity Card -->
                     <div class="dashboard-card recent-activity-card">
                         <div class="card-header">
@@ -198,9 +209,14 @@
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <input type="text" id="search-books" placeholder="Rechercher par titre, auteur ou ISBN...">
                     </div>
-                    <button class="btn btn-primary" onclick="openModal('modal-book')">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter un livre
-                    </button>
+                    <div class="action-buttons" style="display:flex;gap:10px;">
+                        <button class="btn btn-secondary" onclick="exportBooksCSV()">
+                            <i class="fa-solid fa-download" aria-hidden="true"></i> Exporter CSV
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('modal-book')">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter un livre
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -231,9 +247,14 @@
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <input type="text" id="search-users" placeholder="Filtrer les utilisateurs par nom, email...">
                     </div>
-                    <button class="btn btn-primary" onclick="openModal('modal-user')">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Créer un utilisateur
-                    </button>
+                    <div class="action-buttons" style="display:flex;gap:10px;">
+                        <button class="btn btn-secondary" onclick="exportUsersCSV()">
+                            <i class="fa-solid fa-download" aria-hidden="true"></i> Exporter CSV
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('modal-user')">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i> Créer un utilisateur
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -262,9 +283,14 @@
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <input type="text" id="search-loans" placeholder="Filtrer les emprunts (livre, utilisateur)...">
                     </div>
-                    <button class="btn btn-primary" onclick="openModal('modal-loan')">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Enregistrer un emprunt
-                    </button>
+                    <div class="action-buttons" style="display:flex;gap:10px;">
+                        <button class="btn btn-secondary" onclick="exportLoansCSV()">
+                            <i class="fa-solid fa-download" aria-hidden="true"></i> Exporter CSV
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('modal-loan')">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i> Enregistrer un emprunt
+                        </button>
+                    </div>
                 </div>
 
                 <div class="table-container">

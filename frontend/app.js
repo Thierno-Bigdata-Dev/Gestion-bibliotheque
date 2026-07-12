@@ -54,8 +54,11 @@ const AppState = {
     activeTab: 'dashboard',
     isOffline: false,
     activeModal: null,
-    previousFocusedElement: null
+    previousFocusedElement: null,
+    needsRefresh: { books: true, users: true, loans: true, dashboard: true }
 };
+
+let loansChartInstance = null;
 
 // 3. ACCESSIBILITE - FOCUS TRAP MANAGER
 const FocusTrap = {
@@ -389,6 +392,7 @@ const UI = {
             
             this.updateConnectionStatus(false);
             this.renderDashboardStats();
+            renderDashboardChart();
         } catch (err) {
             console.error(err);
             this.updateConnectionStatus(true);
@@ -440,6 +444,8 @@ const UI = {
             `;
             list.appendChild(tr);
         });
+        
+        renderDashboardChart();
     },
     
     async loadBooksList() {
@@ -897,7 +903,7 @@ async function returnBook(loanId) {
         await ApiService.request(`${API_URLS.loans}/${loanId}/return`, { method: 'POST' });
         showToast("Livre restitué avec succès.", "success");
         AppState.needsRefresh.dashboard = true;
-        loadAllData(); // Reload everything since stock and loans changed
+        UI.loadDashboardData();
     } catch (e) {
         showToast("Erreur lors de la restitution.", "danger");
     }
@@ -910,7 +916,7 @@ async function renewLoan(loanId) {
         await ApiService.request(`${API_URLS.loans}/${loanId}/renew`, { method: 'POST' });
         showToast("Emprunt renouvelé avec succès (+15 jours).", "success");
         AppState.needsRefresh.dashboard = true;
-        loadAllData();
+        UI.loadDashboardData();
     } catch (e) {
         showToast("Erreur lors du renouvellement.", "danger");
     }
@@ -1052,3 +1058,139 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.init();
     setupSearchFilters();
 });
+
+// ==========================================
+// Chart.js & Analytics
+// ==========================================
+function renderDashboardChart() {
+    const canvas = document.getElementById('loansChart');
+    if (!canvas) return;
+    
+    // Si aucun emprunt, on ne crée pas le graphe
+    if (AppState.loans.length === 0) {
+        if (loansChartInstance) loansChartInstance.destroy();
+        return;
+    }
+    
+    let active = 0, returned = 0, overdue = 0;
+    
+    AppState.loans.forEach(l => {
+        if (l.status === 'returned') {
+            returned++;
+        } else {
+            if (new Date() > new Date(l.due_at)) {
+                overdue++;
+            } else {
+                active++;
+            }
+        }
+    });
+    
+    if (loansChartInstance) {
+        loansChartInstance.data.datasets[0].data = [returned, active, overdue];
+        loansChartInstance.update();
+    } else {
+        const ctx = canvas.getContext('2d');
+        loansChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Retournés', 'En cours', 'En retard'],
+                datasets: [{
+                    data: [returned, active, overdue],
+                    backgroundColor: [
+                        '#10b981', // green
+                        '#f59e0b', // yellow/orange
+                        '#ef4444'  // red
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0', // var(--text-primary) equivalent
+                            font: { family: "'Outfit', sans-serif" }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// ==========================================
+// CSV Export Functions
+// ==========================================
+function exportToCSV(filename, rows) {
+    const processRow = function(row) {
+        let finalVal = '';
+        for (let j = 0; j < row.length; j++) {
+            let innerValue = row[j] === null || row[j] === undefined ? '' : row[j].toString();
+            if (row[j] instanceof Date) {
+                innerValue = row[j].toLocaleString();
+            }
+            let result = innerValue.replace(/"/g, '""');
+            if (result.search(/("|,|\n)/g) >= 0)
+                result = '"' + result + '"';
+            if (j > 0)
+                finalVal += ',';
+            finalVal += result;
+        }
+        return finalVal + '\n';
+    };
+
+    let csvFile = '\uFEFF'; // BOM for UTF-8 Excel compatibility
+    for (let i = 0; i < rows.length; i++) {
+        csvFile += processRow(rows[i]);
+    }
+
+    const blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    if (link.download !== undefined) { 
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function exportBooksCSV() {
+    const rows = [["ID", "Titre", "Auteur", "ISBN", "Année", "Quantité Totale", "Disponible"]];
+    AppState.books.forEach(b => {
+        rows.push([b.id, b.title, b.author, b.isbn, b.published_year || '', b.quantity, b.available_quantity]);
+    });
+    exportToCSV(`inventaire_livres_${new Date().toISOString().slice(0,10)}.csv`, rows);
+}
+
+function exportUsersCSV() {
+    const rows = [["ID", "Prénom", "Nom", "Email", "Rôle", "Inscrit le"]];
+    AppState.users.forEach(u => {
+        const dateStr = u.created_at ? new Date(u.created_at).toLocaleDateString('fr-FR') : '';
+        rows.push([u.id, u.first_name, u.last_name, u.email, u.role, dateStr]);
+    });
+    exportToCSV(`utilisateurs_${new Date().toISOString().slice(0,10)}.csv`, rows);
+}
+
+function exportLoansCSV() {
+    const rows = [["ID", "Livre", "Emprunteur", "Emprunté le", "Date limite", "Retourné le", "Statut"]];
+    AppState.loans.forEach(l => {
+        const bookTitle = l.book ? l.book.title : `Livre #${l.book_id}`;
+        const userName = l.user ? `${l.user.first_name} ${l.user.last_name}` : `Utilisateur #${l.user_id}`;
+        const bDate = l.borrowed_at ? new Date(l.borrowed_at).toLocaleDateString('fr-FR') : '';
+        const dDate = l.due_at ? new Date(l.due_at).toLocaleDateString('fr-FR') : '';
+        const rDate = l.returned_at ? new Date(l.returned_at).toLocaleDateString('fr-FR') : '';
+        const status = l.status === 'active' ? (new Date() > new Date(l.due_at) ? 'En retard' : 'En cours') : 'Retourné';
+        
+        rows.push([l.id, bookTitle, userName, bDate, dDate, rDate, status]);
+    });
+    exportToCSV(`historique_emprunts_${new Date().toISOString().slice(0,10)}.csv`, rows);
+}
