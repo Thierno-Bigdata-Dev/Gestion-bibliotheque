@@ -81,8 +81,8 @@ export const UI = {
         this.dom.tabs.forEach(t => t.classList.remove('active'));
         this.dom.tabContents.forEach(c => c.classList.remove('active'));
         
-        const activeNav = document.querySelector(`.menu-item[onclick*="${tabId}"]`);
-        const activeContent = document.getElementById(tabId);
+        const activeNav = document.querySelector(`.menu-item[data-tab="${tabId}"]`);
+        const activeContent = document.getElementById(`tab-${tabId}`);
         
         if (activeNav) activeNav.classList.add('active');
         if (activeContent) activeContent.classList.add('active');
