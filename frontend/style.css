@@ -538,7 +538,8 @@ body {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     box-shadow: var(--shadow-md);
 }
 
@@ -588,6 +589,12 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.actions-cell button, .actions-cell .btn {
+    flex-shrink: 0;
 }
 
 /* Status Badges */
