@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // ─── Informations du projet ───────────────────────────────────────────
-        PROJECT_NAME  = "dit-library-pipeline"
+        PROJECT_NAME  = "CI-CD-Gestion-Bibliotheque"
         APP_PORT      = "8085"
         JENKINS_PORT  = "8080"
 
