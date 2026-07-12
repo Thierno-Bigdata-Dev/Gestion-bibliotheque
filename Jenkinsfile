@@ -137,8 +137,10 @@ pipeline {
 
                     HOST_ADDR="host.docker.internal"
                     if ! ping -c1 -W1 "$HOST_ADDR" > /dev/null 2>&1; then
-                        # Fallback Linux : adresse de la gateway Docker
-                        HOST_ADDR=$(ip route show default | awk "/default/ {print \\$3}" | head -1)
+                        # Fallback Linux : lecture de la gateway par défaut via /proc/net/route
+                        # (ne nécessite pas iproute2, contrairement à "ip route")
+                        HOST_ADDR=$(awk '$2 == "00000000" {print $3}' /proc/net/route | head -1 | \
+                            awk '{print strtonum("0x" substr($0,7,2))"."strtonum("0x" substr($0,5,2))"."strtonum("0x" substr($0,3,2))"."strtonum("0x" substr($0,1,2))}')
                         echo "host.docker.internal non disponible, utilisation de : $HOST_ADDR"
                     fi
                     echo "Adresse hôte détectée : $HOST_ADDR"
