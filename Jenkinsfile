@@ -129,6 +129,21 @@ pipeline {
                 echo " Vérification de la disponibilité des microservices"
                 echo "======================================================"
                 sh '''
+                    # ─── Détection de l'adresse hôte ──────────────────────────────
+                    # Jenkins tourne dans un conteneur Docker.
+                    # "localhost" = Jenkins lui-même (pas la machine hôte).
+                    # → On utilise "host.docker.internal" (Docker Desktop Windows/Mac)
+                    #   ou la gateway Docker (172.17.0.1) comme fallback sur Linux.
+
+                    HOST_ADDR="host.docker.internal"
+                    if ! ping -c1 -W1 "$HOST_ADDR" > /dev/null 2>&1; then
+                        # Fallback Linux : adresse de la gateway Docker
+                        HOST_ADDR=$(ip route show default | awk "/default/ {print \\$3}" | head -1)
+                        echo "host.docker.internal non disponible, utilisation de : $HOST_ADDR"
+                    fi
+                    echo "Adresse hôte détectée : $HOST_ADDR"
+
+                    # ─── Fonction de vérification avec retry ───────────────────────
                     check_service() {
                         local name=$1
                         local url=$2
@@ -136,12 +151,12 @@ pipeline {
                         local attempt=1
 
                         while [ $attempt -le $max_attempts ]; do
-                            if curl -sf --max-time 3 "$url" > /dev/null 2>&1; then
-                                echo "[✓] $name est opérationnel ($url)"
+                            if curl -sf --max-time 5 "$url" > /dev/null 2>&1; then
+                                echo "[✓] $name est opérationnel"
                                 return 0
                             fi
                             echo "  Tentative $attempt/$max_attempts pour $name..."
-                            sleep 3
+                            sleep 4
                             attempt=$((attempt + 1))
                         done
 
@@ -149,10 +164,11 @@ pipeline {
                         return 1
                     }
 
-                    check_service "Books Service (5001)"  "http://localhost:5001/books"
-                    check_service "Users Service (5002)"  "http://localhost:5002/users"
-                    check_service "Loans Service (5003)"  "http://localhost:5003/loans"
-                    check_service "Frontend / Gateway"    "http://localhost:8085"
+                    # ─── Vérification via l'adresse hôte ──────────────────────────
+                    check_service "Books Service (5001)"  "http://${HOST_ADDR}:5001/books"
+                    check_service "Users Service (5002)"  "http://${HOST_ADDR}:5002/users"
+                    check_service "Loans Service (5003)"  "http://${HOST_ADDR}:5003/loans"
+                    check_service "Frontend / Gateway"    "http://${HOST_ADDR}:8085"
 
                     echo ""
                     echo "✅ Tous les services sont en ligne !"
