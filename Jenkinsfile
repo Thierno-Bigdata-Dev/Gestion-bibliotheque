@@ -89,13 +89,30 @@ pipeline {
                 echo "======================================================"
                 echo " Déploiement via Docker Compose"
                 echo "======================================================"
-                // Arrêt propre des anciens conteneurs
-                sh "cd ${COMPOSE_DIR} && docker compose down --remove-orphans"
 
-                // Démarrage de la nouvelle version en arrière-plan
+                // ── NETTOYAGE COMPLET ────────────────────────────────────
+                // Problème : docker-compose.yml utilise des container_name fixes.
+                // Jenkins (projet "dit-library-pipeline") et le déploiement local
+                // (projet "gestion-bibliotheque") créent des stacks différentes,
+                // mais partagent les mêmes noms de conteneurs → conflit.
+                // Solution : arrêter les DEUX projets possibles + force-remove résidus.
+
+                // 1) Arrêt du projet Jenkins courant
+                sh "cd ${COMPOSE_DIR} && docker compose down --remove-orphans 2>/dev/null || true"
+
+                // 2) Arrêt du projet déploiement local (nom du répertoire source)
+                sh "docker compose -p gestion-bibliotheque -f ${COMPOSE_DIR}/docker-compose.yml down --remove-orphans 2>/dev/null || true"
+
+                // 3) Suppression forcée de tout conteneur résiduel aux noms conflictuels
+                sh """
+                    docker rm -f dit_library_db dit_books_service dit_users_service \
+                                 dit_loans_service dit_frontend_gateway 2>/dev/null || true
+                """
+
+                // ── DÉPLOIEMENT ──────────────────────────────────────────
                 sh "cd ${COMPOSE_DIR} && docker compose up -d"
 
-                // Attente de l'initialisation de la base de données et des services
+                // Attente de l'initialisation de la base de données
                 echo "Attente de 15 secondes pour l'initialisation..."
                 sh 'sleep 15'
 
