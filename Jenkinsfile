@@ -69,16 +69,18 @@ pipeline {
         stage('5. Health Checks') {
             steps {
                 sh '''
+                    # Detection de l'adresse de l'hote (Docker Desktop Windows/Mac vs Linux)
+                    # On utilise host.docker.internal par defaut
                     HOST_ADDR="host.docker.internal"
-                    if ! ping -c1 -W1 "$HOST_ADDR" > /dev/null 2>&1; then
-                        HOST_ADDR=$(ip route show default | awk "/default/ {print \\$3}" | head -1)
-                    fi
-                    echo "Adresse hôte détectée : $HOST_ADDR"
+                    
+                    # On ne fait plus de 'ping' ni de 'ip route' car ces outils 
+                    # ne sont pas installes dans le conteneur Jenkins.
+                    # host.docker.internal fonctionne tres bien avec curl.
 
-                    curl -sf "http://${HOST_ADDR}:5006/books"  && echo "[✓] Books Service OK"  || echo "[✗] Books Service KO"
-                    curl -sf "http://${HOST_ADDR}:5005/users"  && echo "[✓] Users Service OK"  || echo "[✗] Users Service KO"
-                    curl -sf "http://${HOST_ADDR}:5007/loans"  && echo "[✓] Loans Service OK"  || echo "[✗] Loans Service KO"
-                    curl -sf "http://${HOST_ADDR}:8090"        && echo "[✓] Frontend OK"       || echo "[✗] Frontend KO"
+                    curl -sf "http://${HOST_ADDR}:5006/books"  && echo "[✓] Books Service OK"  || (echo "[✗] Books Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:5005/users"  && echo "[✓] Users Service OK"  || (echo "[✗] Users Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:5007/loans"  && echo "[✓] Loans Service OK"  || (echo "[✗] Loans Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:8090"        && echo "[✓] Frontend OK"       || (echo "[✗] Frontend KO"; exit 1)
                 '''
             }
         }
