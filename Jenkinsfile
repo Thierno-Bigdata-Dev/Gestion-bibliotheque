@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PROJECT_NAME  = "CI-CD-Gestion-bibliotheque"
-        APP_PORT      = "8085"
+        APP_PORT      = "8090"
         JENKINS_PORT  = "8080"
         COMPOSE_DIR   = "${WORKSPACE}"
         NGROK_URL     = "https://threefold-sculpture-chest.ngrok-free.dev"
@@ -48,7 +48,8 @@ pipeline {
                 echo "======================================================"
                 sh "cd ${COMPOSE_DIR} && docker compose build --pull"
                 // Liste explicitement les services au lieu de laisser Jenkins chercher les container_name
-                sh "cd ${COMPOSE_DIR} && docker compose images frontend books-service users-service loans-service db"
+                // On ajoute || true pour eviter de bloquer le build en cas de conteneur orphelin/stale
+                sh "cd ${COMPOSE_DIR} && docker compose images frontend books-service users-service loans-service db || true"
             }
         }
 
@@ -74,10 +75,10 @@ pipeline {
                     fi
                     echo "Adresse hôte détectée : $HOST_ADDR"
 
-                    curl -sf "http://${HOST_ADDR}:5001/books"  && echo "[✓] Books Service OK"  || echo "[✗] Books Service KO"
-                    curl -sf "http://${HOST_ADDR}:5002/users"  && echo "[✓] Users Service OK"  || echo "[✗] Users Service KO"
-                    curl -sf "http://${HOST_ADDR}:5003/loans"  && echo "[✓] Loans Service OK"  || echo "[✗] Loans Service KO"
-                    curl -sf "http://${HOST_ADDR}:8085"        && echo "[✓] Frontend OK"       || echo "[✗] Frontend KO"
+                    curl -sf "http://${HOST_ADDR}:5006/books"  && echo "[✓] Books Service OK"  || echo "[✗] Books Service KO"
+                    curl -sf "http://${HOST_ADDR}:5005/users"  && echo "[✓] Users Service OK"  || echo "[✗] Users Service KO"
+                    curl -sf "http://${HOST_ADDR}:5007/loans"  && echo "[✓] Loans Service OK"  || echo "[✗] Loans Service KO"
+                    curl -sf "http://${HOST_ADDR}:8090"        && echo "[✓] Frontend OK"       || echo "[✗] Frontend KO"
                 '''
             }
         }
