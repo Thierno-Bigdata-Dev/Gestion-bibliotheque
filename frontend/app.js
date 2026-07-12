@@ -723,6 +723,33 @@ function openModal(modalId) {
     }
 }
 
+// Custom UI Confirm Dialog
+function customConfirm(message) {
+    return new Promise((resolve) => {
+        document.getElementById('confirm-modal-message').textContent = message;
+        openModal('modal-confirm');
+        
+        const btnOk = document.getElementById('btn-confirm-ok');
+        const btnCancel = document.getElementById('btn-confirm-cancel');
+        
+        // Nettoyer les anciens event listeners
+        const newBtnOk = btnOk.cloneNode(true);
+        const newBtnCancel = btnCancel.cloneNode(true);
+        btnOk.parentNode.replaceChild(newBtnOk, btnOk);
+        btnCancel.parentNode.replaceChild(newBtnCancel, btnCancel);
+        
+        newBtnOk.addEventListener('click', () => {
+            closeModal('modal-confirm');
+            resolve(true);
+        });
+        
+        newBtnCancel.addEventListener('click', () => {
+            closeModal('modal-confirm');
+            resolve(false);
+        });
+    });
+}
+
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (!modal) return;
@@ -841,7 +868,7 @@ function editUser(id) {
 
 // Suppressions CRUD
 async function deleteBook(id) {
-    if (!confirm("Voulez-vous retirer définitivement cet ouvrage du catalogue ?")) return;
+    if (!await customConfirm("Voulez-vous retirer définitivement cet ouvrage du catalogue ?")) return;
     try {
         await ApiService.request(`${API_URLS.books}/${id}`, { method: 'DELETE' });
         showToast("Livre supprimé du catalogue.", "success");
@@ -852,7 +879,7 @@ async function deleteBook(id) {
 }
 
 async function deleteUser(id) {
-    if (!confirm("Voulez-vous supprimer définitivement ce profil utilisateur ?")) return;
+    if (!await customConfirm("Voulez-vous supprimer définitivement ce profil utilisateur ?")) return;
     try {
         await ApiService.request(`${API_URLS.users}/${id}`, { method: 'DELETE' });
         showToast("Utilisateur supprimé de la base.", "success");
@@ -864,7 +891,7 @@ async function deleteUser(id) {
 
 // Retour Emprunt
 async function returnBook(loanId) {
-    if (!confirm("Confirmer la restitution et l'incrémentation du stock ?")) return;
+    if (!await customConfirm("Confirmer la restitution et l'incrémentation du stock ?")) return;
     
     try {
         await ApiService.request(`${API_URLS.loans}/${loanId}/return`, { method: 'POST' });
@@ -877,7 +904,7 @@ async function returnBook(loanId) {
 }
 
 async function renewLoan(loanId) {
-    if (!confirm("Voulez-vous renouveler cet emprunt pour 15 jours supplémentaires ?")) return;
+    if (!await customConfirm("Voulez-vous renouveler cet emprunt pour 15 jours supplémentaires ?")) return;
     
     try {
         await ApiService.request(`${API_URLS.loans}/${loanId}/renew`, { method: 'POST' });

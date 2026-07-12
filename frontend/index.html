@@ -463,6 +463,22 @@
         </div>
     </div>
 
+    <!-- Custom Confirm Modal -->
+    <div id="modal-confirm" class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title" tabindex="-1">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="border-bottom: none; justify-content: center;">
+                <h2 id="confirm-modal-title">Confirmation</h2>
+            </div>
+            <div class="modal-body" style="padding: 20px 0;">
+                <p id="confirm-modal-message" style="font-size: 1.1rem; color: var(--text-color);"></p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; border-top: none;">
+                <button type="button" class="btn btn-secondary" id="btn-confirm-cancel">Annuler</button>
+                <button type="button" class="btn btn-primary" id="btn-confirm-ok">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
     <!-- HTML Skeletons reusable Templates (shimmer effect placeholders) -->
     
     <!-- Table Rows skeleton template (used in tab changes loading states) -->
