@@ -47,9 +47,11 @@ pipeline {
                 echo " Construction des images Docker"
                 echo "======================================================"
                 sh "cd ${COMPOSE_DIR} && docker compose build --pull"
-                sh "cd ${COMPOSE_DIR} && docker compose images"
+                // Liste explicitement les services au lieu de laisser Jenkins chercher les container_name
+                sh "cd ${COMPOSE_DIR} && docker compose images frontend books-service users-service loans-service db"
             }
         }
+
 
         stage('4. Deploy') {
             steps {
