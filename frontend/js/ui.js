@@ -224,16 +224,15 @@ export const UI = {
         const loans = appStore.getState('loans');
         const users = appStore.getState('users');
 
-        document.getElementById('stat-books-total').textContent = books.length;
-        document.getElementById('stat-users-total').textContent = users.length;
+        document.getElementById('stat-total-books').textContent = books.length;
+        document.getElementById('stat-total-users').textContent = users.length;
         
         const activeLoans = loans.filter(l => l.status === 'active').length;
-        document.getElementById('stat-loans-active').textContent = activeLoans;
+        document.getElementById('stat-active-loans').textContent = activeLoans;
         
-        const overdueLoans = loans.filter(l => l.status === 'active' && new Date() > new Date(l.due_at)).length;
-        const overdueEl = document.getElementById('stat-loans-overdue');
-        overdueEl.textContent = overdueLoans;
-        overdueEl.style.color = overdueLoans > 0 ? 'var(--danger)' : 'inherit';
+        const returnedLoans = loans.filter(l => l.status === 'returned').length;
+        const returnRate = loans.length === 0 ? 0 : Math.round((returnedLoans / loans.length) * 100);
+        document.getElementById('stat-return-rate').textContent = `${returnRate}%`;
     },
 
     renderDashboardChart(loans) {

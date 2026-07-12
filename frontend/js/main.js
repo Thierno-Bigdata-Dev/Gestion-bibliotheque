@@ -148,7 +148,7 @@ class App {
                 author: document.getElementById('book-author').value,
                 isbn: document.getElementById('book-isbn').value,
                 published_year: parseInt(document.getElementById('book-year').value),
-                quantity: parseInt(document.getElementById('book-quantity').value)
+                quantity: parseInt(document.getElementById('book-qty').value)
             };
             try {
                 await ApiService.createBook(data);
