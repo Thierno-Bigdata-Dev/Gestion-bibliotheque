@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // ─── Informations du projet ───────────────────────────────────────────
-        PROJECT_NAME  = "dit-library-management"
+        PROJECT_NAME  = "dit-library-pipeline"
         APP_PORT      = "8085"
         JENKINS_PORT  = "8080"
 
@@ -73,9 +73,12 @@ pipeline {
         stage('3. Docker Build') {
             steps {
                 echo "======================================================"
-                echo " Construction des images Docker (sans cache)"
+                echo " Construction des images Docker (cache activé)"
                 echo "======================================================"
-                sh "cd ${COMPOSE_DIR} && docker compose build --no-cache"
+                // --pull : vérifie si une nouvelle version de l'image de base existe
+                // Le cache Docker est conservé pour les couches non modifiées
+                // Build ~30s (code only) au lieu de ~5min (--no-cache)
+                sh "cd ${COMPOSE_DIR} && docker compose build --pull"
                 sh "cd ${COMPOSE_DIR} && docker compose images"
             }
         }

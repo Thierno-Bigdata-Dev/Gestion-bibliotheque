@@ -2,10 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Installer les dépendances système pour psycopg2 si nécessaire
+# psycopg2-binary est une roue pré-compilée : aucun compilateur C requis
+# Seul libpq5 est nécessaire à l'exécution (connexion PostgreSQL)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -18,3 +18,4 @@ EXPOSE 5001
 
 # Lancer avec Gunicorn en production
 CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "2", "app:app"]
+

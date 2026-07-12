@@ -2,9 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# psycopg2-binary est une roue pré-compilée : aucun compilateur C requis
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
+    libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -16,3 +16,4 @@ COPY . .
 EXPOSE 5003
 
 CMD ["gunicorn", "--bind", "0.0.0.0:5003", "--workers", "2", "app:app"]
+
