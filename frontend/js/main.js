@@ -183,8 +183,8 @@ class App {
         document.getElementById('form-loan')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const data = {
-                book_id: parseInt(document.getElementById('loan-book-id').value),
-                user_id: parseInt(document.getElementById('loan-user-id').value)
+                book_id: parseInt(document.getElementById('loan-book-select').value),
+                user_id: parseInt(document.getElementById('loan-user-select').value)
             };
             try {
                 await ApiService.createLoan(data);

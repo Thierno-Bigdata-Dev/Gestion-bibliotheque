@@ -40,7 +40,7 @@ export const UI = {
         this.dom.tabs.forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
-                const tabId = tab.getAttribute('onclick').match(/'([^']+)'/)[1];
+                const tabId = tab.getAttribute('data-tab');
                 appStore.setState('activeTab', tabId);
             });
         });
@@ -317,8 +317,8 @@ export const UI = {
     },
 
     populateLoanSelects() {
-        const bookSelect = document.getElementById('loan-book-id');
-        const userSelect = document.getElementById('loan-user-id');
+        const bookSelect = document.getElementById('loan-book-select');
+        const userSelect = document.getElementById('loan-user-select');
         
         bookSelect.innerHTML = '<option value="">Sélectionnez un livre...</option>';
         appStore.getState('books').forEach(b => {
