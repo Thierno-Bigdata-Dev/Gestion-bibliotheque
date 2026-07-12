@@ -25,7 +25,7 @@ export const UI = {
 
     cacheDOM() {
         this.dom = {
-            tabs: document.querySelectorAll('.nav-link'),
+            tabs: document.querySelectorAll('.menu-item'),
             tabContents: document.querySelectorAll('.tab-content'),
             offlineBanner: document.getElementById('offline-banner'),
             booksList: document.getElementById('books-list'),
@@ -81,8 +81,8 @@ export const UI = {
         this.dom.tabs.forEach(t => t.classList.remove('active'));
         this.dom.tabContents.forEach(c => c.classList.remove('active'));
         
-        const activeNav = document.querySelector(`.nav-link[onclick*="${tabId}"]`);
-        const activeContent = document.getElementById(`tab-${tabId}`);
+        const activeNav = document.querySelector(`.menu-item[onclick*="${tabId}"]`);
+        const activeContent = document.getElementById(tabId);
         
         if (activeNav) activeNav.classList.add('active');
         if (activeContent) activeContent.classList.add('active');
