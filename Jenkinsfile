@@ -1,6 +1,13 @@
 pipeline {
     agent any
 
+    triggers {
+        // Polls GitHub every minute to see if there are changes. 
+        // If webhooks are configured, you can also use githubPush()
+        pollSCM('* * * * *')
+        githubPush()
+    }
+
     environment {
         PROJECT_NAME  = "CI-CD-Gestion-bibliotheque"
         APP_PORT      = "8090"
