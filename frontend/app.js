@@ -584,7 +584,10 @@ const UI = {
                 <td><span class="badge ${badgeClass}">${badgeText}</span></td>
                 <td class="actions-cell">
                     ${l.status === 'active' ? 
-                        `<button class="btn btn-success btn-xs" onclick="returnBook(${l.id})"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Restituer</button>` : 
+                        `<div style="display:flex;gap:4px;">
+                            <button class="btn btn-success btn-xs" onclick="returnBook(${l.id})"><i class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></i> Restituer</button>
+                            <button class="btn btn-info btn-xs" onclick="renewLoan(${l.id})"><i class="fa-solid fa-calendar-plus" aria-hidden="true"></i> Renouveler</button>
+                        </div>` : 
                         `<span class="badge badge-success"><i class="fa-solid fa-check" aria-hidden="true"></i> Fini</span>`
                     }
                 </td>
@@ -862,14 +865,32 @@ async function deleteUser(id) {
 // Retour Emprunt
 async function returnBook(loanId) {
     if (!confirm("Confirmer la restitution et l'incrémentation du stock ?")) return;
+    
     try {
         await ApiService.request(`${API_URLS.loans}/${loanId}/return`, { method: 'POST' });
-        showToast("Livre retourné avec succès.", "success");
-        UI.loadLoansList();
-    } catch (err) {
-        showToast(err.message, "danger");
+        showToast("Livre restitué avec succès.", "success");
+        AppState.needsRefresh.dashboard = true;
+        loadAllData(); // Reload everything since stock and loans changed
+    } catch (e) {
+        showToast("Erreur lors de la restitution.", "danger");
     }
 }
+
+async function renewLoan(loanId) {
+    if (!confirm("Voulez-vous renouveler cet emprunt pour 15 jours supplémentaires ?")) return;
+    
+    try {
+        await ApiService.request(`${API_URLS.loans}/${loanId}/renew`, { method: 'POST' });
+        showToast("Emprunt renouvelé avec succès (+15 jours).", "success");
+        AppState.needsRefresh.dashboard = true;
+        loadAllData();
+    } catch (e) {
+        showToast("Erreur lors du renouvellement.", "danger");
+    }
+}
+
+// ==========================================
+// User Profile Modal logic
 
 // Affichage profil utilisateur détaillé et son historique personnel d'emprunts
 async function viewUserProfile(userId) {

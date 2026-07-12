@@ -128,7 +128,7 @@ def create_loan():
         
     # 4. Enregistrer l'emprunt
     borrow_date = datetime.datetime.utcnow()
-    due_date = borrow_date + datetime.timedelta(days=14) # Durée standard d'emprunt : 14 jours
+    due_date = borrow_date + datetime.timedelta(days=15) # Durée standard d'emprunt : 15 jours
     
     loan = Loan(
         user_id=user_id,
@@ -161,6 +161,23 @@ def return_loan(loan_id):
     # 2. Mettre à jour l'emprunt
     loan.status = 'returned'
     loan.returned_at = datetime.datetime.utcnow()
+    db.session.commit()
+    
+    return jsonify(enrich_loan_data(loan)), 200
+
+@app.route('/loans/<int:loan_id>/renew', methods=['POST'])
+def renew_loan(loan_id):
+    loan = Loan.query.get_or_404(loan_id)
+    
+    if loan.status == 'returned':
+        return jsonify({'error': 'Cannot renew a returned loan'}), 400
+        
+    # Ajouter 15 jours à la date limite actuelle
+    if loan.due_at:
+        loan.due_at = loan.due_at + datetime.timedelta(days=15)
+    else:
+        loan.due_at = datetime.datetime.utcnow() + datetime.timedelta(days=15)
+        
     db.session.commit()
     
     return jsonify(enrich_loan_data(loan)), 200
