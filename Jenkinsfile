@@ -2,100 +2,164 @@ pipeline {
     agent any
 
     environment {
-        PROJECT_NAME = "dit-library-management"
-        APP_PORT     = "8085"
-        // Répertoire de travail Jenkins - permet à docker compose de trouver les fichiers
-        COMPOSE_DIR  = "${WORKSPACE}"
+        // ─── Informations du projet ───────────────────────────────────────────
+        PROJECT_NAME  = "dit-library-management"
+        APP_PORT      = "8085"
+        JENKINS_PORT  = "8080"
+
+        // ─── Répertoire workspace Jenkins (chemin du dépôt cloné) ────────────
+        // Permet à docker compose de trouver le docker-compose.yml au bon endroit
+        COMPOSE_DIR   = "${WORKSPACE}"
+
+        // ─── URL publique ngrok (gratuit) ─────────────────────────────────────
+        // ⚠ Mettre à jour cette valeur si vous relancez ngrok (URL change)
+        NGROK_URL     = "https://threefold-sculpture-chest.ngrok-free.dev"
     }
 
     stages {
-        stage('1. Récupération du code') {
+
+        // ── Stage 1 : Récupération du code source depuis GitHub ───────────────
+        stage('1. Checkout Code') {
             steps {
-                echo "=== Démarrage du Pipeline Jenkins ==="
-                echo "Clonage et récupération des fichiers de la branche courante..."
+                echo "======================================================"
+                echo " Pipeline CI/CD - ${PROJECT_NAME}"
+                echo " Build : #${BUILD_NUMBER} | Branche : ${GIT_BRANCH}"
+                echo "======================================================"
                 checkout scm
+                sh 'echo "Commit : $(git rev-parse --short HEAD) - $(git log -1 --pretty=%B)"'
             }
         }
 
-        stage('2. Analyse Statique & Compilation') {
+        // ── Stage 2 : Analyse syntaxique Python (lint) ────────────────────────
+        stage('2. Lint & Analyse Statique') {
             parallel {
-                stage('Vérification Books Service') {
+                stage('Books Service') {
                     steps {
-                        echo "Validation syntaxique de Books Service..."
-                        // Vérifie que le code Python compile correctement
-                        sh 'python3 -m py_compile backend/books-service/app.py backend/books-service/models.py || echo "Veuillez vérifier le code Python de Books Service"'
+                        echo "--- Lint : backend/books-service ---"
+                        sh '''
+                            python3 -m py_compile backend/books-service/app.py \
+                                                  backend/books-service/models.py \
+                            && echo "[OK] Books Service - Aucune erreur de syntaxe" \
+                            || echo "[WARN] Books Service - Erreur de syntaxe détectée"
+                        '''
                     }
                 }
-                stage('Vérification Users Service') {
+                stage('Users Service') {
                     steps {
-                        echo "Validation syntaxique de Users Service..."
-                        sh 'python3 -m py_compile backend/users-service/app.py backend/users-service/models.py || echo "Veuillez vérifier le code Python de Users Service"'
+                        echo "--- Lint : backend/users-service ---"
+                        sh '''
+                            python3 -m py_compile backend/users-service/app.py \
+                                                  backend/users-service/models.py \
+                            && echo "[OK] Users Service - Aucune erreur de syntaxe" \
+                            || echo "[WARN] Users Service - Erreur de syntaxe détectée"
+                        '''
                     }
                 }
-                stage('Vérification Loans Service') {
+                stage('Loans Service') {
                     steps {
-                        echo "Validation syntaxique de Loans Service..."
-                        sh 'python3 -m py_compile backend/loans-service/app.py backend/loans-service/models.py || echo "Veuillez vérifier le code Python de Loans Service"'
+                        echo "--- Lint : backend/loans-service ---"
+                        sh '''
+                            python3 -m py_compile backend/loans-service/app.py \
+                                                  backend/loans-service/models.py \
+                            && echo "[OK] Loans Service - Aucune erreur de syntaxe" \
+                            || echo "[WARN] Loans Service - Erreur de syntaxe détectée"
+                        '''
                     }
                 }
             }
         }
 
-        stage('3. Build des Images Docker') {
+        // ── Stage 3 : Construction des images Docker ──────────────────────────
+        stage('3. Docker Build') {
             steps {
-                echo "=== Construction des Images Docker ==="
-                // cd explicite vers le workspace pour que docker compose trouve le fichier yml
+                echo "======================================================"
+                echo " Construction des images Docker (sans cache)"
+                echo "======================================================"
                 sh "cd ${COMPOSE_DIR} && docker compose build --no-cache"
+                sh "cd ${COMPOSE_DIR} && docker compose images"
             }
         }
 
-        stage('4. Déploiement Automatique') {
+        // ── Stage 4 : Déploiement (rolling restart) ───────────────────────────
+        stage('4. Deploy') {
             steps {
-                echo "=== Déploiement avec Docker Compose ==="
-                // Arrêt de l'ancienne version et lancement de la nouvelle
-                sh "cd ${COMPOSE_DIR} && docker compose down"
+                echo "======================================================"
+                echo " Déploiement via Docker Compose"
+                echo "======================================================"
+                // Arrêt propre des anciens conteneurs
+                sh "cd ${COMPOSE_DIR} && docker compose down --remove-orphans"
+
+                // Démarrage de la nouvelle version en arrière-plan
                 sh "cd ${COMPOSE_DIR} && docker compose up -d"
-                
-                echo "=== Attente de l'initialisation des services ==="
-                sh 'sleep 10'
-                
-                echo "=== Statut des conteneurs déployés ==="
+
+                // Attente de l'initialisation de la base de données et des services
+                echo "Attente de 15 secondes pour l'initialisation..."
+                sh 'sleep 15'
+
+                // Affichage du statut final
+                echo "--- Statut des conteneurs ---"
                 sh "cd ${COMPOSE_DIR} && docker compose ps"
             }
         }
 
-        stage('5. Vérification Santé des Services') {
+        // ── Stage 5 : Tests de santé (Health Checks) ─────────────────────────
+        stage('5. Health Checks') {
             steps {
-                echo "=== Test de santé des microservices ==="
+                echo "======================================================"
+                echo " Vérification de la disponibilité des microservices"
+                echo "======================================================"
                 sh '''
-                    echo "Test Books Service (port 5001)..."
-                    curl -sf http://localhost:5001/books && echo "OK" || echo "Books Service: Démarrage en cours..."
+                    check_service() {
+                        local name=$1
+                        local url=$2
+                        local max_attempts=5
+                        local attempt=1
 
-                    echo "Test Users Service (port 5002)..."
-                    curl -sf http://localhost:5002/users && echo "OK" || echo "Users Service: Démarrage en cours..."
+                        while [ $attempt -le $max_attempts ]; do
+                            if curl -sf --max-time 3 "$url" > /dev/null 2>&1; then
+                                echo "[✓] $name est opérationnel ($url)"
+                                return 0
+                            fi
+                            echo "  Tentative $attempt/$max_attempts pour $name..."
+                            sleep 3
+                            attempt=$((attempt + 1))
+                        done
 
-                    echo "Test Loans Service (port 5003)..."
-                    curl -sf http://localhost:5003/loans && echo "OK" || echo "Loans Service: Démarrage en cours..."
+                        echo "[✗] $name ne répond pas après $max_attempts tentatives"
+                        return 1
+                    }
+
+                    check_service "Books Service (5001)"  "http://localhost:5001/books"
+                    check_service "Users Service (5002)"  "http://localhost:5002/users"
+                    check_service "Loans Service (5003)"  "http://localhost:5003/loans"
+                    check_service "Frontend / Gateway"    "http://localhost:8085"
+
+                    echo ""
+                    echo "✅ Tous les services sont en ligne !"
                 '''
             }
         }
     }
 
+    // ── Post Actions ──────────────────────────────────────────────────────────
     post {
         success {
-            echo "=================================================================="
-            echo " FÉLICITATIONS ! Le déploiement s'est terminé avec succès.       "
-            echo " L'application DIT Library est accessible sur : http://localhost:${APP_PORT} "
-            echo "=================================================================="
+            echo "======================================================"
+            echo " ✅ BUILD #${BUILD_NUMBER} RÉUSSI"
+            echo " Application accessible sur : http://localhost:${APP_PORT}"
+            echo " Jenkins (public) : ${NGROK_URL}"
+            echo "======================================================"
         }
         failure {
-            echo "=================================================================="
-            echo " ERREUR ! Le pipeline Jenkins a échoué.                         "
-            echo " Veuillez vérifier les logs de l'étape en échec.                "
-            echo "=================================================================="
+            echo "======================================================"
+            echo " ❌ BUILD #${BUILD_NUMBER} ÉCHOUÉ"
+            echo " Consultez les logs de l'étape en erreur ci-dessus."
+            echo " Commande de diagnostic : docker compose logs"
+            echo "======================================================"
         }
         always {
-            echo "=== Fin du pipeline - Statut: ${currentBuild.currentResult} ==="
+            echo "--- Pipeline terminé : ${currentBuild.currentResult} | Durée : ${currentBuild.durationString} ---"
         }
     }
 }
+
