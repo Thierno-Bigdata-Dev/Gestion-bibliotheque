@@ -429,6 +429,9 @@ const UI = {
             const badgeText = loan.status === 'active' ? 'En cours' : 'Retourné';
             
             const tr = document.createElement('tr');
+            if (loan.status === 'active' && new Date() > new Date(loan.due_at)) {
+                tr.classList.add('row-overdue');
+            }
             tr.innerHTML = `
                 <td><strong>${escapeHtml(bookTitle)}</strong></td>
                 <td>${escapeHtml(userName)}</td>
@@ -568,6 +571,9 @@ const UI = {
             const badgeText = l.status === 'active' ? (isLate ? 'En retard' : 'Actif') : 'Retourné';
             
             const tr = document.createElement('tr');
+            if (isLate) {
+                tr.classList.add('row-overdue');
+            }
             tr.innerHTML = `
                 <td>${l.id}</td>
                 <td><strong>${escapeHtml(bookTitle)}</strong></td>
