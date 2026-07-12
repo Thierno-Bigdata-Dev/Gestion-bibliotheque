@@ -11,7 +11,7 @@ services:
       - pg-data:/var/lib/postgresql/data
       - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "5432:5432"
+      - "5434:5432"
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
@@ -28,7 +28,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_books
       - PORT=5001
     ports:
-      - "5001:5001"
+      - "5006:5001"
     restart: always
     depends_on:
       db:
@@ -43,7 +43,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_users
       - PORT=5002
     ports:
-      - "5002:5002"
+      - "5005:5002"
     restart: always
     depends_on:
       db:
@@ -60,7 +60,7 @@ services:
       - USERS_SERVICE_URL=http://users-service:5002
       - PORT=5003
     ports:
-      - "5003:5003"
+      - "5007:5003"
     restart: always
     depends_on:
       db:
@@ -76,7 +76,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "8085:80"
+      - "8090:80"
     restart: always
     depends_on:
       - books-service
