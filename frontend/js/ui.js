@@ -45,6 +45,14 @@ export const UI = {
             });
         });
 
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                document.getElementById('app-root').classList.toggle('sidebar-collapsed');
+            });
+        }
+
         // Search inputs
         const bindSearch = (id, key) => {
             const el = document.getElementById(id);
