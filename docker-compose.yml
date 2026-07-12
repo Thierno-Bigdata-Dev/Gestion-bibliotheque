@@ -1,10 +1,8 @@
-
 services:
 
   # Database Service (PostgreSQL)
   db:
     image: postgres:15-alpine
-    container_name: dit_library_db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -16,7 +14,7 @@ services:
       - "5432:5432"
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -26,7 +24,6 @@ services:
     build:
       context: ./backend/books-service
       dockerfile: Dockerfile
-    container_name: dit_books_service
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_books
       - PORT=5001
@@ -42,7 +39,6 @@ services:
     build:
       context: ./backend/users-service
       dockerfile: Dockerfile
-    container_name: dit_users_service
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_users
       - PORT=5002
@@ -53,12 +49,11 @@ services:
       db:
         condition: service_healthy
 
-  # Loans & Returns Management Microservice (Communicates with Books and Users)
+  # Loans & Returns Management Microservice
   loans-service:
     build:
       context: ./backend/loans-service
       dockerfile: Dockerfile
-    container_name: dit_loans_service
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_loans
       - BOOKS_SERVICE_URL=http://books-service:5001
@@ -80,7 +75,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: dit_frontend_gateway
     ports:
       - "8085:80"
     restart: always
