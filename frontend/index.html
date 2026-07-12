@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIT Library - Système de Gestion Moderne</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container" id="app-root">
+        <!-- Sidebar Navigation (a11y: role navigation) -->
+        <aside class="sidebar" aria-label="Menu principal">
+            <div class="sidebar-brand">
+                <div class="logo-icon" aria-hidden="true">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>DIT Library</h2>
+                    <span>Dakar Institute</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu" role="navigation">
+                <ul>
+                    <li class="menu-item active" data-tab="dashboard" role="tab" aria-selected="true" tabindex="0">
+                        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+                        <span>Tableau de bord</span>
+                    </li>
+                    <li class="menu-item" data-tab="books" role="tab" aria-selected="false" tabindex="0">
+                        <i class="fa-solid fa-book" aria-hidden="true"></i>
+                        <span>Livres</span>
+                    </li>
+                    <li class="menu-item" data-tab="users" role="tab" aria-selected="false" tabindex="0">
+                        <i class="fa-solid fa-users" aria-hidden="true"></i>
+                        <span>Utilisateurs</span>
+                    </li>
+                    <li class="menu-item" data-tab="loans" role="tab" aria-selected="false" tabindex="0">
+                        <i class="fa-solid fa-handshake" aria-hidden="true"></i>
+                        <span>Emprunts</span>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer" aria-hidden="true">
+                <div class="user-badge">
+                    <div class="avatar">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div class="user-info">
+                        <p class="name">DevOps Team</p>
+                        <p class="role">Administrateur</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content" tabindex="-1">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <h1 id="page-title">Tableau de Bord</h1>
+                    <p class="subtitle" id="page-subtitle">Aperçu général des statistiques et activités</p>
+                </div>
+                <div class="navbar-right">
+                    <div class="system-time">
+                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                        <span id="current-time">--:--:--</span>
+                    </div>
+                    <div class="status-indicator online" id="connection-status">
+                        <span class="dot"></span>
+                        <span id="connection-text">Système Connecté</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Offline / Network Error Boundary Screen (Visual component) -->
+            <div id="service-error-panel" class="error-panel" style="display: none;">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                <h3 id="error-panel-title">Erreur de Connexion</h3>
+                <p id="error-panel-desc">Impossible de communiquer avec les microservices backend. Veuillez vérifier que les conteneurs Docker sont démarrés.</p>
+                <button class="btn btn-primary" id="btn-reconnect" onclick="loadAllData()">
+                    <i class="fa-solid fa-arrows-rotate"></i> Réessayer la connexion
+                </button>
+            </div>
+
+            <!-- Dashboard View -->
+            <section id="tab-dashboard" class="tab-content active" role="tabpanel" aria-labelledby="dashboard-tab">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card" tabindex="0">
+                        <div class="stat-icon books-color" aria-hidden="true">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-total-books">0</h3>
+                            <p>Livres en Stock</p>
+                        </div>
+                        <div class="stat-trend positive" id="stat-avail-books-container">
+                            <span id="stat-avail-books">0</span> disponibles
+                        </div>
+                    </div>
+                    <div class="stat-card" tabindex="0">
+                        <div class="stat-icon users-color" aria-hidden="true">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-total-users">0</h3>
+                            <p>Utilisateurs Enregistrés</p>
+                        </div>
+                        <div class="stat-trend">
+                            L2 DIT Academic
+                        </div>
+                    </div>
+                    <div class="stat-card" tabindex="0">
+                        <div class="stat-icon active-loans-color" aria-hidden="true">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-active-loans">0</h3>
+                            <p>Emprunts Actifs</p>
+                        </div>
+                        <div class="stat-trend warning">
+                            En cours de lecture
+                        </div>
+                    </div>
+                    <div class="stat-card" tabindex="0">
+                        <div class="stat-icon returns-color" aria-hidden="true">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 id="stat-return-rate">0%</h3>
+                            <p>Taux de Retour</p>
+                        </div>
+                        <div class="stat-trend positive">
+                            Livres restitués
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Interactive Charts/Lists Row -->
+                <div class="dashboard-row">
+                    <!-- Quick Actions Card -->
+                    <div class="dashboard-card quick-actions-card">
+                        <div class="card-header">
+                            <h2>Actions Rapides</h2>
+                            <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                        </div>
+                        <div class="card-body">
+                            <button class="btn btn-primary" onclick="openModal('modal-loan')">
+                                <i class="fa-solid fa-plus" aria-hidden="true"></i> Nouvel Emprunt
+                            </button>
+                            <button class="btn btn-secondary" onclick="openModal('modal-book')">
+                                <i class="fa-solid fa-book-medical" aria-hidden="true"></i> Ajouter un Livre
+                            </button>
+                            <button class="btn btn-info" onclick="openModal('modal-user')">
+                                <i class="fa-solid fa-user-plus" aria-hidden="true"></i> Créer Utilisateur
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Recent Activity Card -->
+                    <div class="dashboard-card recent-activity-card">
+                        <div class="card-header">
+                            <h2>Derniers Emprunts</h2>
+                            <a href="#" class="view-all" onclick="switchTab('loans')">Voir tout</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive-minimal">
+                                <table class="table-minimal">
+                                    <thead>
+                                        <tr>
+                                            <th>Livre</th>
+                                            <th>Emprunteur</th>
+                                            <th>Date d'emprunt</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-loans-list">
+                                        <!-- Loaded by skeleton or API -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Books View -->
+            <section id="tab-books" class="tab-content" role="tabpanel">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input type="text" id="search-books" placeholder="Rechercher par titre, auteur ou ISBN...">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('modal-book')">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter un livre
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="table-books">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>ISBN</th>
+                                <th>Année</th>
+                                <th>Stock Total</th>
+                                <th>Disponible</th>
+                                <th class="actions-header">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="books-list">
+                            <!-- Loaded by skeleton or API -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Users View -->
+            <section id="tab-users" class="tab-content" role="tabpanel">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input type="text" id="search-users" placeholder="Filtrer les utilisateurs par nom, email...">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('modal-user')">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Créer un utilisateur
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="table-users">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nom Complet</th>
+                                <th>Email</th>
+                                <th>Rôle</th>
+                                <th>Date d'inscription</th>
+                                <th class="actions-header">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list">
+                            <!-- Loaded by skeleton or API -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Loans View -->
+            <section id="tab-loans" class="tab-content" role="tabpanel">
+                <div class="action-bar">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input type="text" id="search-loans" placeholder="Filtrer les emprunts (livre, utilisateur)...">
+                    </div>
+                    <button class="btn btn-primary" onclick="openModal('modal-loan')">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Enregistrer un emprunt
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="table-loans">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Livre</th>
+                                <th>Emprunteur</th>
+                                <th>Date d'emprunt</th>
+                                <th>Date limite</th>
+                                <th>Date de retour</th>
+                                <th>Statut</th>
+                                <th class="actions-header">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loans-list">
+                            <!-- Loaded by skeleton or API -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals Section (a11y: role dialog, aria-modal, focus trapping hooks) -->
+
+    <!-- Book Modal (Add / Edit) -->
+    <div id="modal-book" class="modal" role="dialog" aria-modal="true" aria-labelledby="book-modal-title" tabindex="-1">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="book-modal-title">Ajouter un nouveau livre</h2>
+                <button class="close-btn" onclick="closeModal('modal-book')" aria-label="Fermer la modal">&times;</button>
+            </div>
+            <form id="form-book" novalidate>
+                <input type="hidden" id="book-id">
+                <div class="form-group">
+                    <label for="book-title">Titre du livre *</label>
+                    <input type="text" id="book-title" required placeholder="Ex: Le Petit Prince" aria-required="true" aria-describedby="book-title-error">
+                    <span class="error-message" id="book-title-error">Le titre du livre est obligatoire.</span>
+                </div>
+                <div class="form-group">
+                    <label for="book-author">Auteur *</label>
+                    <input type="text" id="book-author" required placeholder="Ex: Antoine de Saint-Exupéry" aria-required="true" aria-describedby="book-author-error">
+                    <span class="error-message" id="book-author-error">L'auteur du livre est obligatoire.</span>
+                </div>
+                <div class="form-group">
+                    <label for="book-isbn">Numéro ISBN (10 ou 13 chiffres) *</label>
+                    <input type="text" id="book-isbn" required placeholder="Ex: 9780156012195" aria-required="true" aria-describedby="book-isbn-error">
+                    <span class="error-message" id="book-isbn-error">Veuillez entrer un ISBN valide (10 ou 13 chiffres numériques).</span>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="book-year">Année de publication</label>
+                        <input type="number" id="book-year" placeholder="Ex: 1943" aria-describedby="book-year-error">
+                        <span class="error-message" id="book-year-error">Année invalide (supérieure à 1000 et inférieure à 2100).</span>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="book-qty">Quantité en stock</label>
+                        <input type="number" id="book-qty" min="1" value="1" required aria-required="true" aria-describedby="book-qty-error">
+                        <span class="error-message" id="book-qty-error">La quantité doit être supérieure ou égale à 1.</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-book')">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-book">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal (Add / Edit) -->
+    <div id="modal-user" class="modal" role="dialog" aria-modal="true" aria-labelledby="user-modal-title" tabindex="-1">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="user-modal-title">Créer un profil utilisateur</h2>
+                <button class="close-btn" onclick="closeModal('modal-user')" aria-label="Fermer la modal">&times;</button>
+            </div>
+            <form id="form-user" novalidate>
+                <input type="hidden" id="user-id">
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="user-firstname">Prénom *</label>
+                        <input type="text" id="user-firstname" required placeholder="Ex: Cheikh" aria-required="true" aria-describedby="user-firstname-error">
+                        <span class="error-message" id="user-firstname-error">Le prénom est requis.</span>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="user-lastname">Nom *</label>
+                        <input type="text" id="user-lastname" required placeholder="Ex: Diop" aria-required="true" aria-describedby="user-lastname-error">
+                        <span class="error-message" id="user-lastname-error">Le nom est requis.</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="user-email">Email Académique *</label>
+                    <input type="email" id="user-email" required placeholder="Ex: cheikh.diop@dit.sn" aria-required="true" aria-describedby="user-email-error">
+                    <span class="error-message" id="user-email-error">Veuillez entrer une adresse email académique valide (ex: nom@dit.sn).</span>
+                </div>
+                <div class="form-group">
+                    <label for="user-role">Type d'utilisateur *</label>
+                    <select id="user-role" required aria-required="true" aria-describedby="user-role-error">
+                        <option value="" disabled selected>Sélectionner le rôle</option>
+                        <option value="Etudiant">Étudiant</option>
+                        <option value="Professeur">Professeur</option>
+                        <option value="Personnel administratif">Personnel administratif</option>
+                    </select>
+                    <span class="error-message" id="user-role-error">Le type d'utilisateur est obligatoire.</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-user')">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-user">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loan Modal (Create Borrowing) -->
+    <div id="modal-loan" class="modal" role="dialog" aria-modal="true" aria-labelledby="loan-modal-title" tabindex="-1">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="loan-modal-title">Enregistrer un nouvel emprunt</h2>
+                <button class="close-btn" onclick="closeModal('modal-loan')" aria-label="Fermer la modal">&times;</button>
+            </div>
+            <form id="form-loan" novalidate>
+                <div class="form-group">
+                    <label for="loan-user-select">Emprunteur (Étudiant / Enseignant) *</label>
+                    <select id="loan-user-select" required aria-required="true" aria-describedby="loan-user-error">
+                        <option value="" disabled selected>Chargement des utilisateurs...</option>
+                    </select>
+                    <span class="error-message" id="loan-user-error">Veuillez sélectionner un emprunteur.</span>
+                </div>
+                <div class="form-group">
+                    <label for="loan-book-select">Livre à emprunter *</label>
+                    <select id="loan-book-select" required aria-required="true" aria-describedby="loan-book-error">
+                        <option value="" disabled selected>Chargement des livres disponibles...</option>
+                    </select>
+                    <span class="error-message" id="loan-book-error">Veuillez sélectionner un livre disponible.</span>
+                    <p class="form-help-text" id="loan-book-availability"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-loan')">Annuler</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-loan">Confirmer l'emprunt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Profile Details Modal -->
+    <div id="modal-user-profile" class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title" tabindex="-1">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="profile-modal-title">Profil Détaillé & Historique</h2>
+                <button class="close-btn" onclick="closeModal('modal-user-profile')" aria-label="Fermer la modal">&times;</button>
+            </div>
+            <div class="profile-layout">
+                <div class="profile-card">
+                    <div class="profile-avatar" aria-hidden="true">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <h3 id="prof-full-name">--</h3>
+                    <p class="badge" id="prof-role">--</p>
+                    <div class="profile-details-list">
+                        <div class="detail-item">
+                            <span class="label">Email :</span>
+                            <span class="value" id="prof-email">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">ID Unique :</span>
+                            <span class="value" id="prof-id">--</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Inscription :</span>
+                            <span class="value" id="prof-created">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="profile-loans">
+                    <h3>Historique Personnel des Emprunts</h3>
+                    <div class="table-responsive">
+                        <table class="data-table-compact">
+                            <thead>
+                                <tr>
+                                    <th>Livre</th>
+                                    <th>Emprunté le</th>
+                                    <th>Retourné le</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prof-loans-list">
+                                <!-- Loaded dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HTML Skeletons reusable Templates (shimmer effect placeholders) -->
+    
+    <!-- Table Rows skeleton template (used in tab changes loading states) -->
+    <template id="template-skeleton-row">
+        <tr class="skeleton-row-placeholder">
+            <td><div class="skeleton skeleton-text" style="width: 30px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width: 85%;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width: 65%;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width: 100px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width: 45px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width: 35px;"></div></td>
+            <td><div class="skeleton skeleton-text" style="width: 60px;"></div></td>
+            <td>
+                <div class="actions-cell">
+                    <div class="skeleton skeleton-btn"></div>
+                    <div class="skeleton skeleton-btn" style="width: 40px;"></div>
+                </div>
+            </td>
+        </tr>
+    </template>
+
+    <!-- Notification Toasts Container (a11y: aria-live polite) -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+    
+    <!-- JS App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # Database Service (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    container_name: dit_library_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Books Management Microservice
+  books-service:
+    build:
+      context: ./backend/books-service
+      dockerfile: Dockerfile
+    container_name: dit_books_service
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_books
+      - PORT=5001
+    ports:
+      - "5001:5001"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Users Management Microservice
+  users-service:
+    build:
+      context: ./backend/users-service
+      dockerfile: Dockerfile
+    container_name: dit_users_service
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_users
+      - PORT=5002
+    ports:
+      - "5002:5002"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Loans & Returns Management Microservice (Communicates with Books and Users)
+  loans-service:
+    build:
+      context: ./backend/loans-service
+      dockerfile: Dockerfile
+    container_name: dit_loans_service
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_loans
+      - BOOKS_SERVICE_URL=http://books-service:5001
+      - USERS_SERVICE_URL=http://users-service:5002
+      - PORT=5003
+    ports:
+      - "5003:5003"
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      books-service:
+        condition: service_started
+      users-service:
+        condition: service_started
+
+  # Frontend & API Gateway (Nginx Reverse Proxy)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dit_frontend_gateway
+    ports:
+      - "8085:80"
+    restart: always
+    depends_on:
+      - books-service
+      - users-service
+      - loans-service
+
+volumes:
+  pg-data:
+    driver: local
