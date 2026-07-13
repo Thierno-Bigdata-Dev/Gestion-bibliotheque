@@ -84,9 +84,9 @@ pipeline {
                     # ne sont pas installes dans le conteneur Jenkins.
                     # host.docker.internal fonctionne tres bien avec curl.
 
-                    curl -sf "http://${HOST_ADDR}:5006/books"  && echo "[✓] Books Service OK"  || (echo "[✗] Books Service KO"; exit 1)
-                    curl -sf "http://${HOST_ADDR}:5005/users"  && echo "[✓] Users Service OK"  || (echo "[✗] Users Service KO"; exit 1)
-                    curl -sf "http://${HOST_ADDR}:5007/loans"  && echo "[✓] Loans Service OK"  || (echo "[✗] Loans Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:5016/books"  && echo "[✓] Books Service OK"  || (echo "[✗] Books Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:5015/users"  && echo "[✓] Users Service OK"  || (echo "[✗] Users Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:5017/loans"  && echo "[✓] Loans Service OK"  || (echo "[✗] Loans Service KO"; exit 1)
                     curl -sf "http://${HOST_ADDR}:8090"        && echo "[✓] Frontend OK"       || (echo "[✗] Frontend KO"; exit 1)
                 '''
             }
