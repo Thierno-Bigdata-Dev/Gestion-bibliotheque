@@ -12,14 +12,18 @@ CREATE TABLE IF NOT EXISTS books (
     isbn VARCHAR(50) UNIQUE NOT NULL,
     published_year INT,
     quantity INT DEFAULT 1 NOT NULL,
-    available_quantity INT DEFAULT 1 NOT NULL
+    available_quantity INT DEFAULT 1 NOT NULL,
+    category VARCHAR(100) DEFAULT 'Autre',
+    image_url TEXT DEFAULT ''
 );
 
-INSERT INTO books (title, author, isbn, published_year, quantity, available_quantity)
+INSERT INTO books (title, author, isbn, published_year, quantity, available_quantity, category, image_url)
 VALUES 
-('Les Misérables', 'Victor Hugo', '978-2070409228', 1862, 5, 4),
-('L''Étranger', 'Albert Camus', '978-2070360024', 1942, 3, 3),
-('Le Petit Prince', 'Antoine de Saint-Exupéry', '978-2070612758', 1943, 2, 1);
+('Les Misérables', 'Victor Hugo', '978-2070409228', 1862, 5, 4, 'Littérature', ''),
+('L''Étranger', 'Albert Camus', '978-2070360024', 1942, 3, 3, 'Littérature', ''),
+('Le Petit Prince', 'Antoine de Saint-Exupéry', '978-2070612758', 1943, 2, 1, 'Littérature', ''),
+('Python pour la Data Science', 'Wes McKinney', '978-1491957660', 2017, 4, 4, 'Informatique & Big Data', ''),
+('Marketing à l''ère numérique', 'Marie Mercanti', '978-2100788872', 2019, 3, 3, 'Marketing Digital', '');
 
 
 \connect dit_users;
@@ -44,9 +48,9 @@ CREATE TABLE IF NOT EXISTS users (
 
 INSERT INTO users (first_name, last_name, email, role, password_hash, status)
 VALUES 
-('Admin', 'Super', 'admin@dit.sn', 'admin', 'scrypt:32768:8:1$hB8vLq$9e7d363b8b1a8d05e0c5f2b8f87e5b2291535456f916053f3e1b1d1f0f4e3c2b', 'ACTIF'),
-('Alioune', 'Fall', 'alioune@dit.sn', 'Etudiant', 'scrypt:32768:8:1$hB8vLq$9e7d363b8b1a8d05e0c5f2b8f87e5b2291535456f916053f3e1b1d1f0f4e3c2b', 'ACTIF'),
-('Bob', 'Ndiaye', 'bob@example.com', 'Enseignant', 'scrypt:32768:8:1$hB8vLq$9e7d363b8b1a8d05e0c5f2b8f87e5b2291535456f916053f3e1b1d1f0f4e3c2b', 'EN_ATTENTE');
+('Admin', 'Super', 'admin@dit.sn', 'admin', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'ACTIF'),
+('Alioune', 'Fall', 'alioune@dit.sn', 'Etudiant', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'ACTIF'),
+('Bob', 'Ndiaye', 'bob@example.com', 'Enseignant', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'EN_ATTENTE');
 
 
 \connect dit_loans;
