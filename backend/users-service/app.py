@@ -124,7 +124,7 @@ def init_db():
 def health():
     return jsonify({'status': 'healthy', 'service': 'users-service'}), 200
 
-@app.route('/auth/register', methods=['POST'])
+@app.route('/users/auth/register', methods=['POST'])
 def register():
     """Inscription publique. Compte créé avec statut EN_ATTENTE."""
     data = request.get_json() or {}
@@ -164,7 +164,7 @@ def register():
         'user': user.to_dict()
     }), 201
 
-@app.route('/auth/login', methods=['POST'])
+@app.route('/users/auth/login', methods=['POST'])
 def login():
     """Connexion. Retourne un JWT si les identifiants sont corrects et le compte est ACTIF."""
     data = request.get_json() or {}
@@ -200,7 +200,7 @@ def login():
         'user': user.to_dict()
     }), 200
 
-@app.route('/auth/me', methods=['GET'])
+@app.route('/users/auth/me', methods=['GET'])
 @token_required
 def get_me(payload):
     """Retourne le profil de l'utilisateur connecté depuis le token."""
