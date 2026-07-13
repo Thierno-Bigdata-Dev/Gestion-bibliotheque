@@ -13,6 +13,7 @@ class App {
         UI.init();
         await this.loadAllData();
         this.bindForms();
+        this.startAutoPolling();
     }
 
     async loadAllData() {
@@ -196,6 +197,11 @@ class App {
                 Components.showToast(err.message, "danger");
             }
         });
+    }
+
+    startAutoPolling() {
+        // Poll every 10 seconds to update dashboard in real-time
+        setInterval(() => this.loadAllData(), 10000);
     }
 }
 

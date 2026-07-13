@@ -11,6 +11,7 @@ export const UI = {
     init() {
         this.cacheDOM();
         this.bindEvents();
+        this.startClock();
         
         // Listen to store changes
         appStore.subscribe('isOffline', isOffline => this.updateConnectionStatus(isOffline));
@@ -331,5 +332,16 @@ export const UI = {
         appStore.getState('users').forEach(u => {
             userSelect.innerHTML += `<option value="${u.id}">${Components.escapeHtml(u.first_name)} ${Components.escapeHtml(u.last_name)}</option>`;
         });
+    },
+
+    startClock() {
+        const update = () => {
+            const el = document.getElementById('current-time');
+            if (el) {
+                el.textContent = new Date().toLocaleTimeString('fr-FR');
+            }
+        };
+        update();
+        setInterval(update, 1000);
     }
 };
