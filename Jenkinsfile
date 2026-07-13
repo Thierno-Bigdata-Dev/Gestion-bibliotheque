@@ -72,7 +72,7 @@ pipeline {
                 echo "======================================================"
                 echo " Déploiement via Docker Compose"
                 echo "======================================================"
-                sh "cd ${COMPOSE_DIR} && docker compose down --remove-orphans || true"
+                sh "cd ${COMPOSE_DIR} && docker compose down -v --remove-orphans || true"
                 sh "cd ${COMPOSE_DIR} && docker compose up -d"
                 sh 'sleep 15'
                 sh "cd ${COMPOSE_DIR} && docker compose ps"
