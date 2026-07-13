@@ -3,10 +3,10 @@
  * Bootstraps the application, links UI and API, and exposes global methods for inline HTML events.
  */
 
-import { ApiService } from './api.js';
-import { appStore } from './store.js';
-import { UI } from './ui.js';
-import { Components } from './components.js';
+import { ApiService } from './api.js?v=3';
+import { appStore } from './store.js?v=3';
+import { UI } from './ui.js?v=3';
+import { Components } from './components.js?v=3';
 
 class App {
     async init() {
