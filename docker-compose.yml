@@ -2,14 +2,15 @@ services:
 
   # Database Service (PostgreSQL)
   db:
-    image: postgres:15-alpine
+    build:
+      context: .
+      dockerfile: db.Dockerfile
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     volumes:
       - pg-data:/var/lib/postgresql/data
-      - ./db-init/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
       - "${DB_PORT:-5436}:5432" # Externe DB_PORT -> Interne 5432
     restart: always
