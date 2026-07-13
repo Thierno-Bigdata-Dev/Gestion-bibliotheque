@@ -261,6 +261,22 @@ body {
     background-color: var(--bg-tertiary);
 }
 
+/* Toggle icon display: normal state (sidebar visible) shows xmark */
+.btn-burger .icon-xmark {
+    display: inline-block;
+}
+.btn-burger .icon-bars {
+    display: none;
+}
+
+/* Collapsed state (sidebar hidden/narrow) shows bars icon */
+.app-container.sidebar-collapsed .btn-burger .icon-xmark {
+    display: none;
+}
+.app-container.sidebar-collapsed .btn-burger .icon-bars {
+    display: inline-block;
+}
+
 .top-navbar h1 {
     font-size: 28px;
     font-weight: 700;
