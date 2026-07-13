@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=3';
-import { Components } from './components.js?v=3';
-import { ApiService } from './api.js?v=3';
+import { appStore } from './store.js?v=4';
+import { Components } from './components.js?v=4';
+import { ApiService } from './api.js?v=4';
 
 export const UI = {
     init() {
@@ -297,6 +297,52 @@ export const UI = {
             modal.classList.remove('show');
             document.body.style.overflow = '';
         }
+    },
+
+    viewUserProfile(userId) {
+        const user = appStore.getState('users').find(u => u.id === userId);
+        if (!user) return;
+
+        const loans = appStore.getState('loans').filter(l => l.user_id === userId);
+
+        document.getElementById('prof-full-name').textContent = `${user.first_name || ''} ${user.last_name || user.name || ''}`;
+        document.getElementById('prof-role').textContent = user.role || 'Étudiant';
+        document.getElementById('prof-email').textContent = user.email;
+        document.getElementById('prof-id').textContent = `#${user.id}`;
+        document.getElementById('prof-created').textContent = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR') : '-';
+
+        const listEl = document.getElementById('prof-loans-list');
+        listEl.innerHTML = '';
+        if (loans.length === 0) {
+            listEl.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucun emprunt enregistré.</td></tr>';
+        } else {
+            loans.forEach(loan => {
+                const bookTitle = loan.book ? loan.book.title : `Livre #${loan.book_id}`;
+                const bDate = loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleDateString('fr-FR') : '-';
+                const rDate = loan.returned_at ? new Date(loan.returned_at).toLocaleDateString('fr-FR') : '-';
+                
+                let badgeClass = 'badge-warning';
+                let badgeText = 'En cours';
+                if (loan.status === 'returned') {
+                    badgeClass = 'badge-success';
+                    badgeText = 'Retourné';
+                } else if (new Date() > new Date(loan.due_at)) {
+                    badgeClass = 'badge-danger';
+                    badgeText = 'En retard';
+                }
+
+                listEl.innerHTML += `
+                    <tr>
+                        <td><strong>${Components.escapeHtml(bookTitle)}</strong></td>
+                        <td>${bDate}</td>
+                        <td>${rDate}</td>
+                        <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    </tr>
+                `;
+            });
+        }
+        
+        this.openModal('modal-user-profile');
     },
 
     customConfirm(message) {

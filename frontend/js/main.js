@@ -3,10 +3,10 @@
  * Bootstraps the application, links UI and API, and exposes global methods for inline HTML events.
  */
 
-import { ApiService } from './api.js?v=3';
-import { appStore } from './store.js?v=3';
-import { UI } from './ui.js?v=3';
-import { Components } from './components.js?v=3';
+import { ApiService } from './api.js?v=4';
+import { appStore } from './store.js?v=4';
+import { UI } from './ui.js?v=4';
+import { Components } from './components.js?v=4';
 
 class App {
     async init() {
@@ -139,6 +139,10 @@ class App {
         } catch (e) {
             Components.showToast("Erreur lors du renouvellement.", "danger");
         }
+    }
+
+    viewUserProfile(id) {
+        UI.viewUserProfile(id);
     }
 
     bindForms() {
