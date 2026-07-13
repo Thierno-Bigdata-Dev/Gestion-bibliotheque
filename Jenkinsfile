@@ -10,7 +10,13 @@ pipeline {
 
     environment {
         PROJECT_NAME  = "CI-CD-Gestion-bibliotheque"
-        APP_PORT      = "8090"
+        DB_PORT       = "5445"
+        BOOKS_PORT    = "5116"
+        USERS_PORT    = "5115"
+        LOANS_PORT    = "5117"
+        FRONTEND_PORT = "8190"
+        
+        APP_PORT      = "8190"
         JENKINS_PORT  = "8080"
         COMPOSE_DIR   = "${WORKSPACE}"
         NGROK_URL     = "https://threefold-sculpture-chest.ngrok-free.dev"
@@ -84,10 +90,10 @@ pipeline {
                     # ne sont pas installes dans le conteneur Jenkins.
                     # host.docker.internal fonctionne tres bien avec curl.
 
-                    curl -sf "http://${HOST_ADDR}:5016/books"  && echo "[✓] Books Service OK"  || (echo "[✗] Books Service KO"; exit 1)
-                    curl -sf "http://${HOST_ADDR}:5015/users"  && echo "[✓] Users Service OK"  || (echo "[✗] Users Service KO"; exit 1)
-                    curl -sf "http://${HOST_ADDR}:5017/loans"  && echo "[✓] Loans Service OK"  || (echo "[✗] Loans Service KO"; exit 1)
-                    curl -sf "http://${HOST_ADDR}:8090"        && echo "[✓] Frontend OK"       || (echo "[✗] Frontend KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:${BOOKS_PORT}/books"  && echo "[✓] Books Service OK"  || (echo "[✗] Books Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:${USERS_PORT}/users"  && echo "[✓] Users Service OK"  || (echo "[✗] Users Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:${LOANS_PORT}/loans"  && echo "[✓] Loans Service OK"  || (echo "[✗] Loans Service KO"; exit 1)
+                    curl -sf "http://${HOST_ADDR}:${FRONTEND_PORT}"        && echo "[✓] Frontend OK"       || (echo "[✗] Frontend KO"; exit 1)
                 '''
             }
         }
