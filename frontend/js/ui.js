@@ -276,7 +276,7 @@ export const UI = {
     openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
-            modal.classList.add('active');
+            modal.classList.add('show');
             document.body.style.overflow = 'hidden';
             if (modalId === 'modal-loan') {
                 this.populateLoanSelects();
@@ -287,7 +287,7 @@ export const UI = {
     closeModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
-            modal.classList.remove('active');
+            modal.classList.remove('show');
             document.body.style.overflow = '';
         }
     },
