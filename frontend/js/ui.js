@@ -288,35 +288,18 @@ export const UI = {
         }
         if (!allUsers) allUsers = [];
         
-        const container = document.getElementById('pending-users-content');
-        if (!container) return;
-
-        if (appStore.getState('isLoading')) {
-            container.innerHTML = `
-                <div class="pending-stats-row" style="margin-bottom: 24px;">
-                    <div class="stat-card pending-stat"><div class="skeleton skeleton-btn" style="width:100%; height:80px;"></div></div>
-                    <div class="stat-card active-stat"><div class="skeleton skeleton-btn" style="width:100%; height:80px;"></div></div>
-                    <div class="stat-card rejected-stat"><div class="skeleton skeleton-btn" style="width:100%; height:80px;"></div></div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h2><div class="skeleton skeleton-text" style="width:200px;"></div></h2>
-                    </div>
-                    <table class="data-table">
-                        <tbody>
-                            ${Components.getSkeletonRowHTML(6).repeat(3)}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            return;
-        }
-
-        const pendingUsers = allUsers.filter(u => u.status === 'EN_ATTENTE');
         const pendingTableBody = document.getElementById('pending-table-body');
         const allAccountsBody = document.getElementById('all-accounts-body');
         
         if (!pendingTableBody || !allAccountsBody) return;
+
+        if (appStore.getState('isLoading')) {
+            pendingTableBody.innerHTML = Components.getSkeletonRowHTML(6).repeat(3);
+            allAccountsBody.innerHTML = Components.getSkeletonRowHTML(7).repeat(3);
+            return;
+        }
+
+        const pendingUsers = allUsers.filter(u => u.status === 'EN_ATTENTE');
         
         // Update stats
         document.getElementById('pending-stat-count').textContent = pendingUsers.length;
