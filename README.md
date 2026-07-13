@@ -133,16 +133,4 @@ Le fichier [Jenkinsfile](file:///c:/Users/HP%20ELITEBOOK/Downloads/Gestion-bibli
 
 ---
 
-## Génération du Rapport PDF requis
 
-Un script Python automatisé [generate_report.py](file:///c:/Users/HP%20ELITEBOOK/Downloads/Gestion-bibliotheque/generate_report.py) est fourni pour compiler instantanément le rapport académique officiel du projet au format PDF.
-
-Pour générer le rapport :
-1. Assurez-vous d'avoir Python installé sur votre machine.
-2. Exécutez le script dans votre terminal :
-   ```bash
-   python generate_report.py
-   ```
-Le script installera automatiquement la dépendance nécessaire (`reportlab`) si elle est absente, et générera un fichier nommé **`Rapport_Projet_Bibliotheque.pdf`** dans le dossier racine du projet.
-
-> **Astuce DevOps** : Prenez des captures d'écran de l'application web et placez-les sous un dossier `screenshots/` (noms de fichiers : `dashboard.png`, `books.png`, `users.png`, `loans.png`) avant d'exécuter le script. Celui-ci les intégrera automatiquement dans le PDF de manière professionnelle.
