@@ -227,6 +227,12 @@ export const UI = {
 
         document.getElementById('stat-total-books').textContent = books.length;
         document.getElementById('stat-total-users').textContent = users.length;
+
+        const students = users.filter(u => u.role === 'Etudiant').length;
+        const teachers = users.filter(u => u.role === 'Enseignant').length;
+        const studentLabel = students > 1 ? 'étudiants' : 'étudiant';
+        const teacherLabel = teachers > 1 ? 'enseignants' : 'enseignant';
+        document.getElementById('stat-users-detail').textContent = `${students} ${studentLabel} / ${teachers} ${teacherLabel}`;
         
         const activeLoans = loans.filter(l => l.status === 'active').length;
         document.getElementById('stat-active-loans').textContent = activeLoans;
