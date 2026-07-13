@@ -81,7 +81,6 @@ Gestion-bibliotheque/
 │   └── init.sql            # Script SQL de création des bases de données
 ├── docker-compose.yml      # Orchestration et liens réseau des conteneurs
 ├── Jenkinsfile             # Script de construction Jenkins
-├── generate_report.py      # Script de génération de rapport PDF
 └── README.md               # Présente documentation
 ```
 
