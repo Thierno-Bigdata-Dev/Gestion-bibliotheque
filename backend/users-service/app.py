@@ -79,20 +79,27 @@ def admin_required(f):
 
 def seed_admin():
     """Crée le compte admin par défaut s'il n'existe pas."""
-    admin = User.query.filter_by(email='admin@dit.sn').first()
-    if not admin:
-        pw_hash = bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        admin = User(
-            first_name='Super',
-            last_name='Admin',
-            email='admin@dit.sn',
-            role='Admin',
-            password_hash=pw_hash,
-            status='ACTIF'
-        )
-        db.session.add(admin)
-        db.session.commit()
-        print("Compte admin par défaut créé : admin@dit.sn / admin123")
+    try:
+        db.session.rollback()  # Assure un état propre de la session
+        admin = User.query.filter_by(email='admin@dit.sn').first()
+        if not admin:
+            pw_hash = bcrypt.hashpw('admin123'.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            admin = User(
+                first_name='Super',
+                last_name='Admin',
+                email='admin@dit.sn',
+                role='Admin',
+                password_hash=pw_hash,
+                status='ACTIF'
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("Compte admin par défaut créé : admin@dit.sn / admin123")
+        else:
+            print("Compte admin déjà existant.")
+    except Exception as e:
+        db.session.rollback()
+        print(f"Seed admin ignoré (probable doublon ou erreur): {e}")
 
 def init_db():
     retries = 10
