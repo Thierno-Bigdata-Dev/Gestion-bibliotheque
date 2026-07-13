@@ -419,6 +419,56 @@ body {
 .stat-trend.positive { color: var(--success); }
 .stat-trend.warning { color: var(--warning); }
 
+/* Pending Accounts Tab Specific */
+.pending-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.pending-stat-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.pending-stat-card i {
+    font-size: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 50%;
+}
+
+.pending-stat-card span {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.pending-stat-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.pending-badge {
+    background-color: #f59e0b;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: auto;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
 /* Dashboard Rows */
 .dashboard-row {
     display: grid;
@@ -1556,5 +1606,110 @@ input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus,
 @media (max-width: 992px) {
     .student-profile-view {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ------------------------------------------------------------- */
+/* SKELETON LOADERS & BUTTON STATES (PROD-READY UI)             */
+/* ------------------------------------------------------------- */
+
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+
+.skeleton {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, var(--bg-secondary) 4%, var(--border-color) 25%, var(--bg-secondary) 36%);
+    background-size: 1000px 100%;
+    border-radius: var(--border-radius-sm);
+    color: transparent !important;
+    pointer-events: none;
+    user-select: none;
+    min-height: 20px;
+    display: inline-block;
+    width: 100%;
+}
+
+.skeleton-text {
+    height: 14px;
+    margin: 4px 0;
+    border-radius: 4px;
+}
+
+.skeleton-btn {
+    height: 32px;
+    width: 32px;
+    border-radius: var(--border-radius-sm);
+}
+
+.skeleton-badge {
+    height: 22px;
+    width: 60px;
+    border-radius: 12px;
+}
+
+/* Button Loading State */
+.btn.is-loading, .btn-action.is-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn.is-loading::after, .btn-action.is-loading::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    margin-left: -8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* ------------------------------------------------------------- */
+/* RESPONSIVE DATA-TABLES (MOBILE CARDS)                        */
+/* ------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .data-table thead {
+        display: none;
+    }
+    .data-table, .data-table tbody, .data-table tr, .data-table td {
+        display: block;
+        width: 100%;
+    }
+    .data-table tr {
+        margin-bottom: 16px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius-md);
+        padding: 12px;
+    }
+    .data-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        text-align: right;
+    }
+    .data-table td:last-child {
+        border-bottom: none;
+    }
+    .data-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        text-align: left;
+        margin-right: 16px;
+    }
+    .actions-cell {
+        justify-content: flex-end;
     }
 }

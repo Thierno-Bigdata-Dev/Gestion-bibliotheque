@@ -6,11 +6,17 @@
 export const Components = {
     // ---- Notifications (Toasts) ----
     showToast(message, type = "info") {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.setAttribute('aria-live', 'polite');
+            document.body.appendChild(container);
+        }
         
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
+        toast.setAttribute('role', 'alert');
         
         const icon = type === 'success' ? 'check-circle' : 
                      type === 'danger' ? 'triangle-exclamation' : 
@@ -21,28 +27,39 @@ export const Components = {
             <span>${this.escapeHtml(message)}</span>
         `;
         
+        // Stacking logic - Append at the top (or bottom depending on CSS, assuming bottom)
         container.appendChild(toast);
         
         // Timeout pour l'animation de sortie
-        setTimeout(() => toast.classList.add('removing'), 3000);
+        setTimeout(() => toast.classList.add('removing'), 4000);
         setTimeout(() => {
             if (toast.parentNode) toast.parentNode.removeChild(toast);
-        }, 3300);
+        }, 4300);
     },
 
     // ---- Empty States ----
-    getEmptyStateHTML(title, message, iconClass) {
+    getEmptyStateHTML(title, message, iconClass, actionBtnHtml = '') {
         return `
             <tr>
-                <td colspan="10" style="text-align: center; padding: 40px 20px;">
+                <td colspan="10" style="text-align: center; padding: 60px 20px;">
                     <div class="empty-state">
-                        <i class="fa-solid ${iconClass}" style="font-size: 3rem; color: var(--border-color); margin-bottom: 15px;"></i>
-                        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 5px;">${title}</h3>
-                        <p style="color: var(--text-secondary);">${message}</p>
+                        <i class="fa-solid ${iconClass}" style="font-size: 3rem; color: var(--border-color); margin-bottom: 20px;" aria-hidden="true"></i>
+                        <h3 style="color: var(--text-primary); font-size: 1.2rem; margin-bottom: 8px;">${title}</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 16px;">${message}</p>
+                        ${actionBtnHtml}
                     </div>
                 </td>
             </tr>
         `;
+    },
+
+    // ---- Skeletons ----
+    getSkeletonRowHTML(columns) {
+        let colsHtml = '';
+        for (let i = 0; i < columns; i++) {
+            colsHtml += `<td><div class="skeleton skeleton-text"></div></td>`;
+        }
+        return `<tr>${colsHtml}</tr>`;
     },
 
     // ---- Table Rows ----

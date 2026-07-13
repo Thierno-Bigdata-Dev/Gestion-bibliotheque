@@ -28,7 +28,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_books
       - PORT=5001 # écoute interne
     ports:
-      - "5006:5001" # externe 5006 -> interne 5001
+      - "5016:5001" # externe 5016 -> interne 5001
     restart: always
     depends_on:
       db:
@@ -43,7 +43,7 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/dit_users
       - PORT=5002 # écoute interne
     ports:
-      - "5005:5002" # externe 5005 -> interne 5002
+      - "5015:5002" # externe 5015 -> interne 5002
     restart: always
     depends_on:
       db:
@@ -60,7 +60,7 @@ services:
       - USERS_SERVICE_URL=http://users-service:5002
       - PORT=5003 # écoute interne
     ports:
-      - "5007:5003" # externe 5007 -> interne 5003
+      - "5017:5003" # externe 5017 -> interne 5003
     restart: always
     depends_on:
       db:

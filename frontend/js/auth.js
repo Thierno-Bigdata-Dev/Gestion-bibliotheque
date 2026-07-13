@@ -49,6 +49,7 @@ export const AuthUI = {
 
         errEl.style.display = 'none';
         btn.disabled = true;
+        btn.classList.add('is-loading');
         btn.querySelector('.btn-text').textContent = 'Connexion…';
 
         try {
@@ -67,6 +68,7 @@ export const AuthUI = {
             errEl.style.display = 'block';
         } finally {
             btn.disabled = false;
+            btn.classList.remove('is-loading');
             btn.querySelector('.btn-text').textContent = 'Se connecter';
         }
     },
@@ -87,6 +89,7 @@ export const AuthUI = {
         errEl.style.display  = 'none';
         succEl.style.display = 'none';
         btn.disabled = true;
+        btn.classList.add('is-loading');
         btn.querySelector('.btn-text').textContent = 'Création…';
 
         try {
@@ -99,6 +102,7 @@ export const AuthUI = {
             errEl.style.display = 'block';
         } finally {
             btn.disabled = false;
+            btn.classList.remove('is-loading');
             btn.querySelector('.btn-text').textContent = 'Créer mon compte';
         }
     },

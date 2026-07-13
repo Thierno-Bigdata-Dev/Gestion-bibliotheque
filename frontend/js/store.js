@@ -8,8 +8,10 @@ class Store {
         this.state = {
             books: [],
             users: [],
+            allUsers: [],
             loans: [],
             isOffline: false,
+            isLoading: true,
             activeTab: sessionStorage.getItem('activeTab') || 'dashboard',
             userRole: sessionStorage.getItem('userRole') || null,
             activeStudentId: sessionStorage.getItem('activeStudentId') || null,

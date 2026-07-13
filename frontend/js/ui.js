@@ -33,6 +33,23 @@ export const UI = {
         });
         appStore.subscribe('userRole', role => this.handleRoleChange(role));
         appStore.subscribe('activeStudentId', studentId => this.renderStudentProfile(studentId));
+        appStore.subscribe('allUsers', users => this.renderPendingTab(users));
+        appStore.subscribe('isLoading', isLoading => {
+            const announcer = document.getElementById('a11y-announcer');
+            if (isLoading) {
+                if (announcer) announcer.textContent = 'Chargement des données en cours...';
+                this.renderBooks([]);
+                this.renderUsers([]);
+                this.renderLoans([]);
+                this.renderPendingTab([]);
+            } else {
+                if (announcer) announcer.textContent = 'Chargement terminé.';
+                this.renderBooks(appStore.getState('books'));
+                this.renderUsers(appStore.getState('users'));
+                this.renderLoans(appStore.getState('loans'));
+                this.renderPendingTab(appStore.getState('allUsers'));
+            }
+        });
 
         // Initial setup from persisted store
         const initialRole = appStore.getState('userRole');
@@ -114,6 +131,11 @@ export const UI = {
     // RENDERERS
     // -----------------------------------------
     renderBooks(books) {
+        if (appStore.getState('isLoading')) {
+            this.dom.booksList.innerHTML = Components.getSkeletonRowHTML(8).repeat(5);
+            return;
+        }
+
         const query = appStore.getState('searchQueries').books;
         const filtered = books.filter(b => 
             b.title.toLowerCase().includes(query) || 
@@ -157,6 +179,11 @@ export const UI = {
     },
 
     renderUsers(users) {
+        if (appStore.getState('isLoading')) {
+            this.dom.usersList.innerHTML = Components.getSkeletonRowHTML(6).repeat(5);
+            return;
+        }
+
         const query = appStore.getState('searchQueries').users;
         const filtered = users.filter(u => 
             u.first_name.toLowerCase().includes(query) || 
@@ -188,11 +215,16 @@ export const UI = {
     },
 
     renderLoans(loans) {
+        if (appStore.getState('isLoading')) {
+            this.dom.loansList.innerHTML = Components.getSkeletonRowHTML(8).repeat(5);
+            return;
+        }
+
         const query = appStore.getState('searchQueries').loans;
         const filtered = loans.filter(l => {
-            const bookTitle = l.book ? l.book.title.toLowerCase() : '';
-            const userName = l.user ? `${l.user.first_name} ${l.user.last_name}`.toLowerCase() : '';
-            return bookTitle.includes(query) || userName.includes(query);
+            const bTitle = l.book ? l.book.title.toLowerCase() : '';
+            const uName = l.user ? `${l.user.first_name} ${l.user.last_name}`.toLowerCase() : '';
+            return bTitle.includes(query) || uName.includes(query);
         });
 
         this.dom.loansList.innerHTML = '';
@@ -248,6 +280,136 @@ export const UI = {
         }
 
         this.renderDashboardChart(loans);
+    },
+
+    renderPendingTab(allUsers = null) {
+        if (!allUsers && appStore.getState('allUsers')) {
+            allUsers = appStore.getState('allUsers');
+        }
+        if (!allUsers) allUsers = [];
+        
+        const container = document.getElementById('pending-users-content');
+        if (!container) return;
+
+        if (appStore.getState('isLoading')) {
+            container.innerHTML = `
+                <div class="pending-stats-row" style="margin-bottom: 24px;">
+                    <div class="stat-card pending-stat"><div class="skeleton skeleton-btn" style="width:100%; height:80px;"></div></div>
+                    <div class="stat-card active-stat"><div class="skeleton skeleton-btn" style="width:100%; height:80px;"></div></div>
+                    <div class="stat-card rejected-stat"><div class="skeleton skeleton-btn" style="width:100%; height:80px;"></div></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2><div class="skeleton skeleton-text" style="width:200px;"></div></h2>
+                    </div>
+                    <table class="data-table">
+                        <tbody>
+                            ${Components.getSkeletonRowHTML(6).repeat(3)}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            return;
+        }
+
+        const pendingUsers = allUsers.filter(u => u.status === 'EN_ATTENTE');
+        const pendingTableBody = document.getElementById('pending-table-body');
+        const allAccountsBody = document.getElementById('all-accounts-body');
+        
+        if (!pendingTableBody || !allAccountsBody) return;
+        
+        // Update stats
+        document.getElementById('pending-stat-count').textContent = pendingUsers.length;
+        document.getElementById('active-stat-count').textContent = allUsers.filter(u => u.status === 'ACTIF').length;
+        document.getElementById('rejected-stat-count').textContent = allUsers.filter(u => u.status === 'REJETÉ').length;
+        
+        // Update menu badge
+        const badge = document.getElementById('pending-count-badge');
+        if (badge) {
+            badge.textContent = pendingUsers.length;
+            badge.style.display = pendingUsers.length > 0 ? 'inline-block' : 'none';
+        }
+
+        // Render Pending Table
+        pendingTableBody.innerHTML = '';
+        if (pendingUsers.length === 0) {
+            pendingTableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary);">
+                        <i class="fa-solid fa-user-clock" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+                        Aucun compte en attente de validation.
+                    </td>
+                </tr>
+            `;
+        } else {
+            pendingUsers.forEach(user => {
+                const tr = document.createElement('tr');
+                const reqDate = user.created_at ? new Date(user.created_at).toLocaleDateString('fr-FR') : '-';
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td><strong>${Components.escapeHtml(user.first_name + ' ' + user.last_name)}</strong></td>
+                    <td>${Components.escapeHtml(user.email)}</td>
+                    <td><span class="badge badge-info">${Components.escapeHtml(user.role)}</span></td>
+                    <td>${reqDate}</td>
+                    <td>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn btn-primary btn-sm" onclick="window.App.validateUser(${user.id})" title="Valider le compte">
+                                <i class="fa-solid fa-check"></i> Valider
+                            </button>
+                            <button class="btn btn-secondary btn-sm" onclick="window.App.rejectUser(${user.id})" style="background:#ef4444;border-color:#ef4444;color:white;" title="Rejeter la demande">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                pendingTableBody.appendChild(tr);
+            });
+        }
+
+        // Render All Accounts Table
+        const statusFilter = document.getElementById('accounts-filter-status')?.value;
+        let filteredAccounts = allUsers;
+        if (statusFilter) {
+            filteredAccounts = filteredAccounts.filter(u => u.status === statusFilter);
+        }
+
+        allAccountsBody.innerHTML = '';
+        if (filteredAccounts.length === 0) {
+            allAccountsBody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;">Aucun compte trouvé.</td></tr>`;
+        } else {
+            filteredAccounts.forEach(user => {
+                const tr = document.createElement('tr');
+                const lastLogin = user.last_login ? new Date(user.last_login).toLocaleString('fr-FR') : 'Jamais';
+                
+                let statusBadge = 'badge-secondary';
+                if (user.status === 'ACTIF') statusBadge = 'badge-success';
+                else if (user.status === 'EN_ATTENTE') statusBadge = 'badge-warning';
+                else if (user.status === 'REJETÉ' || user.status === 'SUSPENDU') statusBadge = 'badge-danger';
+                
+                let actions = '';
+                if (user.id !== appStore.getState('currentUser')?.id) {
+                    if (user.status === 'EN_ATTENTE') {
+                        actions = `<button class="btn-icon btn-icon-success" onclick="window.App.validateUser(${user.id})" title="Valider"><i class="fa-solid fa-check"></i></button>`;
+                    } else if (user.status === 'ACTIF') {
+                        actions = `<button class="btn-icon btn-icon-danger" onclick="window.App.suspendUser(${user.id})" title="Suspendre"><i class="fa-solid fa-ban"></i></button>`;
+                    } else if (user.status === 'SUSPENDU') {
+                        actions = `<button class="btn-icon btn-icon-success" onclick="window.App.validateUser(${user.id})" title="Réactiver"><i class="fa-solid fa-play"></i></button>`;
+                    }
+                    actions += `<button class="btn-icon btn-icon-danger" onclick="window.App.deleteUser(${user.id})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>`;
+                }
+                
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td><strong>${Components.escapeHtml(user.first_name + ' ' + user.last_name)}</strong></td>
+                    <td>${Components.escapeHtml(user.email)}</td>
+                    <td>${Components.escapeHtml(user.role)}</td>
+                    <td><span class="badge ${statusBadge}">${user.status || 'INCONNU'}</span></td>
+                    <td style="font-size:12px;color:var(--text-secondary)">${lastLogin}</td>
+                    <td><div style="display:flex;gap:4px;">${actions}</div></td>
+                `;
+                allAccountsBody.appendChild(tr);
+            });
+        }
     },
 
     renderDashboardStats() {
@@ -314,10 +476,23 @@ export const UI = {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            
             document.body.style.overflow = 'hidden';
             if (modalId === 'modal-loan') {
                 this.populateLoanSelects();
             }
+            
+            // A11y: set focus on the first input or the close button
+            setTimeout(() => {
+                const focusable = modal.querySelector('input, select, textarea, button');
+                if (focusable) focusable.focus();
+            }, 100);
+            
+            // Basic focus trap
+            modal.addEventListener('keydown', this.handleFocusTrap);
         }
     },
 
@@ -325,7 +500,29 @@ export const UI = {
         const modal = document.getElementById(modalId);
         if (modal) {
             modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
+            modal.removeEventListener('keydown', this.handleFocusTrap);
+        }
+    },
+
+    handleFocusTrap(e) {
+        if (e.key === 'Escape') {
+            UI.closeModal(e.currentTarget.id);
+            return;
+        }
+        if (e.key === 'Tab') {
+            const focusableEls = e.currentTarget.querySelectorAll('a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])');
+            if (!focusableEls.length) return;
+            const first = focusableEls[0];
+            const last = focusableEls[focusableEls.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                last.focus();
+                e.preventDefault();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                first.focus();
+                e.preventDefault();
+            }
         }
     },
 
@@ -531,3 +728,5 @@ export const UI = {
         setInterval(update, 1000);
     }
 };
+
+window.UI = UI;

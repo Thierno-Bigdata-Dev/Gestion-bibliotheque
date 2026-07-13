@@ -15,7 +15,7 @@ export const ApiService = {
     // ─────────────────────────────────────────────
     // CORE REQUEST METHOD
     // ─────────────────────────────────────────────
-    async request(url, options = {}) {
+    async request(url, options = {}, retries = 2, backoff = 500) {
         const timeout = 8000;
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
@@ -51,14 +51,24 @@ export const ApiService = {
             }
 
             if (!response.ok) {
-                const errMsg = (data && data.error) ? data.error : `HTTP ${response.status}`;
+                const errMsg = (data && data.error) ? data.error : `Erreur Serveur HTTP ${response.status}`;
                 throw new Error(errMsg);
             }
             return data;
         } catch (err) {
             clearTimeout(id);
+            // Retry logic for network failures or timeouts on GET requests
+            if (retries > 0 && (!options.method || options.method === 'GET')) {
+                console.warn(`[API] Retrying ${url} in ${backoff}ms... (${retries} attempts left)`);
+                await new Promise(res => setTimeout(res, backoff));
+                return this.request(url, options, retries - 1, backoff * 2);
+            }
+            
             if (err.name === 'AbortError') {
-                throw new Error("Délai de connexion dépassé (Timeout API)");
+                throw new Error("Délai de connexion dépassé (Timeout API). Veuillez vérifier votre connexion.");
+            }
+            if (err.message === 'Failed to fetch') {
+                throw new Error("Impossible de joindre le serveur. Vérifiez votre connexion internet.");
             }
             throw err;
         }

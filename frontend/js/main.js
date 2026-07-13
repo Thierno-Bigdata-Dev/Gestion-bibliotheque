@@ -20,24 +20,42 @@ class App {
     }
 
     async loadAllData() {
+        appStore.setState('isLoading', true);
         try {
             appStore.setState('isOffline', false);
             
             // Promise.all for parallel fetching
-            const [books, users, loans] = await Promise.all([
+            const role = appStore.getState('userRole');
+            
+            const promises = [
                 ApiService.getBooks(),
                 ApiService.getUsers(),
                 ApiService.getLoans()
-            ]);
+            ];
+            
+            if (role === 'admin') {
+                promises.push(ApiService.getAllUsers());
+            }
+            
+            const results = await Promise.all(promises);
+            const books = results[0];
+            const users = results[1];
+            const loans = results[2];
             
             appStore.setState('books', books);
             appStore.setState('users', users);
             appStore.setState('loans', loans);
             
+            if (role === 'admin') {
+                appStore.setState('allUsers', results[3]);
+            }
+            
         } catch (error) {
             console.error(error);
             appStore.setState('isOffline', true);
             Components.showToast("Erreur de Connexion avec le backend.", "danger");
+        } finally {
+            appStore.setState('isLoading', false);
         }
     }
 
@@ -122,6 +140,38 @@ class App {
         }
     }
 
+    async validateUser(id) {
+        try {
+            await ApiService.validateUser(id);
+            Components.showToast("Compte validé avec succès.", "success");
+            this.loadAllData();
+        } catch (err) {
+            Components.showToast(err.message, "danger");
+        }
+    }
+
+    async rejectUser(id) {
+        if (!await UI.customConfirm("Voulez-vous rejeter cette demande de compte ?")) return;
+        try {
+            await ApiService.rejectUser(id);
+            Components.showToast("Compte rejeté.", "warning");
+            this.loadAllData();
+        } catch (err) {
+            Components.showToast(err.message, "danger");
+        }
+    }
+
+    async suspendUser(id) {
+        if (!await UI.customConfirm("Voulez-vous suspendre ce compte (l'utilisateur ne pourra plus se connecter) ?")) return;
+        try {
+            await ApiService.suspendUser(id);
+            Components.showToast("Compte suspendu.", "warning");
+            this.loadAllData();
+        } catch (err) {
+            Components.showToast(err.message, "danger");
+        }
+    }
+
     async returnBook(id) {
         if (!await UI.customConfirm("Confirmer la restitution ?")) return;
         try {
@@ -151,6 +201,9 @@ class App {
     bindForms() {
         document.getElementById('form-book')?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            if (btn) { btn.classList.add('is-loading'); btn.disabled = true; }
+            
             const data = {
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
@@ -166,11 +219,16 @@ class App {
                 this.loadAllData();
             } catch (err) {
                 Components.showToast(err.message, "danger");
+            } finally {
+                if (btn) { btn.classList.remove('is-loading'); btn.disabled = false; }
             }
         });
 
         document.getElementById('form-user')?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            if (btn) { btn.classList.add('is-loading'); btn.disabled = true; }
+
             const data = {
                 first_name: document.getElementById('user-firstname').value,
                 last_name: document.getElementById('user-lastname').value,
@@ -185,11 +243,16 @@ class App {
                 this.loadAllData();
             } catch (err) {
                 Components.showToast(err.message, "danger");
+            } finally {
+                if (btn) { btn.classList.remove('is-loading'); btn.disabled = false; }
             }
         });
 
         document.getElementById('form-loan')?.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            if (btn) { btn.classList.add('is-loading'); btn.disabled = true; }
+
             const data = {
                 book_id: parseInt(document.getElementById('loan-book-select').value),
                 user_id: parseInt(document.getElementById('loan-user-select').value)
@@ -202,6 +265,8 @@ class App {
                 this.loadAllData();
             } catch (err) {
                 Components.showToast(err.message, "danger");
+            } finally {
+                if (btn) { btn.classList.remove('is-loading'); btn.disabled = false; }
             }
         });
     }

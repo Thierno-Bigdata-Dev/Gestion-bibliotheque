@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
+    <!-- Accessibility Live Region -->
+    <div id="a11y-announcer" aria-live="polite" class="visually-hidden" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap;"></div>
+
     <!-- Auth Screen Overlay (Login / Register) -->
     <div id="auth-screen" class="auth-overlay">
         <div class="auth-container">
@@ -154,6 +157,11 @@
                         <i class="fa-solid fa-handshake" aria-hidden="true"></i>
                         <span>Emprunts</span>
                     </li>
+                    <li class="menu-item admin-only" data-tab="pending" role="tab" aria-selected="false" tabindex="0" id="menu-pending">
+                        <i class="fa-solid fa-user-clock" aria-hidden="true"></i>
+                        <span>Validations</span>
+                        <span class="pending-badge" id="pending-count-badge" style="display:none">0</span>
+                    </li>
                     <li class="menu-item public-only" data-tab="student-portal" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
                         <span>Mon Espace</span>
@@ -163,21 +171,17 @@
             
             <div class="sidebar-footer">
                 <div class="user-badge admin-only">
-                    <div class="avatar">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
+                    <div class="avatar" id="sidebar-user-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;">A</div>
                     <div class="user-info">
-                        <p class="name">DevOps Team</p>
-                        <p class="role">Administrateur</p>
+                        <p class="name" id="sidebar-user-name">Admin</p>
+                        <p class="role" id="sidebar-user-role">Administrateur</p>
                     </div>
                 </div>
                 <div class="user-badge public-only">
-                    <div class="avatar">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
+                    <div class="avatar" id="sidebar-student-avatar" style="display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;">?</div>
                     <div class="user-info">
                         <p class="name" id="active-student-name">Lecteur Public</p>
-                        <p class="role">Portail Étudiant</p>
+                        <p class="role" id="sidebar-user-role-public">Portail Étudiant</p>
                     </div>
                 </div>
                 <button id="btn-logout" style="margin-top: 12px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ef4444; border-radius: var(--border-radius-sm); padding: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s;">
@@ -439,6 +443,102 @@
                         </thead>
                         <tbody id="loans-list">
                             <!-- Loaded by skeleton or API -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Pending Accounts Validation Tab (Admin only) -->
+            <section id="tab-pending" class="tab-content admin-only" role="tabpanel">
+                <div class="section-header">
+                    <div>
+                        <h2>Validations de comptes</h2>
+                        <p class="section-subtitle">Comptes en attente de validation administrateur</p>
+                    </div>
+                    <button class="btn-action btn-refresh" onclick="loadAllData()" title="Actualiser">
+                        <i class="fa-solid fa-rotate"></i> Actualiser
+                    </button>
+                </div>
+
+                <!-- Stats bar -->
+                <div class="pending-stats-row" id="pending-stats-row">
+                    <div class="pending-stat-card">
+                        <i class="fa-solid fa-user-clock" style="color:#f59e0b"></i>
+                        <div>
+                            <span id="pending-stat-count">0</span>
+                            <p>En attente</p>
+                        </div>
+                    </div>
+                    <div class="pending-stat-card">
+                        <i class="fa-solid fa-user-check" style="color:#22c55e"></i>
+                        <div>
+                            <span id="active-stat-count">0</span>
+                            <p>Comptes actifs</p>
+                        </div>
+                    </div>
+                    <div class="pending-stat-card">
+                        <i class="fa-solid fa-user-xmark" style="color:#ef4444"></i>
+                        <div>
+                            <span id="rejected-stat-count">0</span>
+                            <p>Rejetés</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending users table -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3 class="table-title"><i class="fa-solid fa-hourglass-half"></i> Comptes en attente</h3>
+                    </div>
+                    <table class="data-table" id="pending-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nom complet</th>
+                                <th>Email</th>
+                                <th>Profil</th>
+                                <th>Demande le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary);">
+                                    <i class="fa-solid fa-user-clock" style="font-size:32px;margin-bottom:12px;opacity:0.4;display:block;"></i>
+                                    Aucun compte en attente de validation.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- All accounts table (filtered by role) -->
+                <div class="table-container" style="margin-top:32px;">
+                    <div class="table-header">
+                        <h3 class="table-title"><i class="fa-solid fa-users-gear"></i> Tous les comptes</h3>
+                        <div class="table-actions">
+                            <select id="accounts-filter-status" onchange="UI.renderPendingTab()" style="background:var(--bg-primary);border:1px solid var(--border-color);border-radius:6px;padding:6px 12px;color:var(--text-primary);font-size:13px;">
+                                <option value="">Tous les statuts</option>
+                                <option value="ACTIF">Actifs</option>
+                                <option value="EN_ATTENTE">En attente</option>
+                                <option value="REJETÉ">Rejetés</option>
+                                <option value="SUSPENDU">Suspendus</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="data-table" id="all-accounts-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nom complet</th>
+                                <th>Email</th>
+                                <th>Profil</th>
+                                <th>Statut</th>
+                                <th>Dernière connexion</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-accounts-body">
                         </tbody>
                     </table>
                 </div>
