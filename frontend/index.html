@@ -12,9 +12,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Data Viz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=4">
+    <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
+    <!-- Portal Selection Overlay -->
+    <div id="portal-selector" class="portal-selector-overlay">
+        <div class="portal-selector-container">
+            <div class="portal-selector-header">
+                <h2>DIT Library</h2>
+                <p>Système de gestion académique. Veuillez sélectionner votre portail d'accès.</p>
+            </div>
+            <div class="portal-cards-grid">
+                <div class="portal-card" id="btn-portal-public">
+                    <div class="portal-card-icon">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h3>Portail Étudiant / Lecteur</h3>
+                    <p>Consultez le catalogue des livres en temps réel, vérifiez la disponibilité et accédez à votre espace d'emprunts personnel.</p>
+                    <button class="btn-portal">Accéder au Catalogue</button>
+                </div>
+                <div class="portal-card" id="btn-portal-admin">
+                    <div class="portal-card-icon">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h3>Espace Administration</h3>
+                    <p>Gérez le catalogue des livres, les profils des utilisateurs, suivez les emprunts physiques et générez des rapports.</p>
+                    <button class="btn-portal">Accéder au Staff</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="app-container" id="app-root">
         <!-- Sidebar Navigation (a11y: role navigation) -->
         <aside class="sidebar" aria-label="Menu principal">
@@ -30,27 +58,32 @@
             
             <nav class="sidebar-menu" role="navigation">
                 <ul>
-                    <li class="menu-item active" data-tab="dashboard" role="tab" aria-selected="true" tabindex="0">
+                    <li class="menu-item active admin-only" data-tab="dashboard" role="tab" aria-selected="true" tabindex="0">
                         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
                         <span>Tableau de bord</span>
                     </li>
                     <li class="menu-item" data-tab="books" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-book" aria-hidden="true"></i>
-                        <span>Livres</span>
+                        <span class="admin-only">Livres</span>
+                        <span class="public-only">Catalogue</span>
                     </li>
-                    <li class="menu-item" data-tab="users" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item admin-only" data-tab="users" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-users" aria-hidden="true"></i>
                         <span>Utilisateurs</span>
                     </li>
-                    <li class="menu-item" data-tab="loans" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item admin-only" data-tab="loans" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-handshake" aria-hidden="true"></i>
                         <span>Emprunts</span>
+                    </li>
+                    <li class="menu-item public-only" data-tab="student-portal" role="tab" aria-selected="false" tabindex="0">
+                        <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
+                        <span>Mon Espace</span>
                     </li>
                 </ul>
             </nav>
             
-            <div class="sidebar-footer" aria-hidden="true">
-                <div class="user-badge">
+            <div class="sidebar-footer">
+                <div class="user-badge admin-only">
                     <div class="avatar">
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
@@ -59,6 +92,18 @@
                         <p class="role">Administrateur</p>
                     </div>
                 </div>
+                <div class="user-badge public-only">
+                    <div class="avatar">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div class="user-info">
+                        <p class="name" id="active-student-name">Lecteur Public</p>
+                        <p class="role">Portail Étudiant</p>
+                    </div>
+                </div>
+                <button id="btn-logout" style="margin-top: 12px; width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #ef4444; border-radius: var(--border-radius-sm); padding: 8px; font-size: 13px; cursor: pointer; transition: background 0.2s;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Déconnexion
+                </button>
             </div>
         </aside>
 
@@ -216,10 +261,10 @@
                         <input type="text" id="search-books" placeholder="Rechercher par titre, auteur ou ISBN...">
                     </div>
                     <div class="action-buttons" style="display:flex;gap:10px;">
-                        <button class="btn btn-secondary" onclick="exportBooksCSV()">
+                        <button class="btn btn-secondary admin-only" onclick="exportBooksCSV()">
                             <i class="fa-solid fa-download" aria-hidden="true"></i> Exporter CSV
                         </button>
-                        <button class="btn btn-primary" onclick="openModal('modal-book')">
+                        <button class="btn btn-primary admin-only" onclick="openModal('modal-book')">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter un livre
                         </button>
                     </div>
@@ -317,6 +362,81 @@
                             <!-- Loaded by skeleton or API -->
                         </tbody>
                     </table>
+                </div>
+            </section>
+
+            <!-- Student Portal View -->
+            <section id="tab-student-portal" class="tab-content" role="tabpanel">
+                <div class="student-portal-container">
+                    <div class="student-login-card">
+                        <h3>Portail Étudiant & Lecteur</h3>
+                        <p>Sélectionnez votre compte pour accéder à votre historique d'emprunts et voir vos informations.</p>
+                        <div class="form-group">
+                            <select id="student-select" class="form-control" style="width: 100%; max-width: 320px; margin: 0 auto; display: block; padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
+                                <option value="">-- Choisir un compte étudiant --</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="student-profile-view" class="student-profile-view hidden">
+                        <!-- Profile Card -->
+                        <div class="dashboard-card" style="padding: 24px;">
+                            <div class="card-header" style="justify-content: flex-start; gap: 12px; margin-bottom: 20px;">
+                                <i class="fa-solid fa-id-card" style="font-size: 24px; color: #6366f1;"></i>
+                                <h2 style="margin:0;">Mon Profil</h2>
+                            </div>
+                            <div class="card-body">
+                                <div style="display:flex; flex-direction:column; gap:12px;">
+                                    <div>
+                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Nom Complet</strong>
+                                        <div id="stu-full-name" style="font-size:16px; font-weight:600; margin-top:2px;">-</div>
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Rôle</strong>
+                                        <div id="stu-role" style="font-size:14px; margin-top:2px;">-</div>
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Email</strong>
+                                        <div id="stu-email" style="font-size:14px; margin-top:2px;">-</div>
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">ID Unique</strong>
+                                        <div id="stu-id" style="font-size:14px; font-family:monospace; margin-top:2px;">-</div>
+                                    </div>
+                                    <div>
+                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Membre depuis</strong>
+                                        <div id="stu-created" style="font-size:14px; margin-top:2px;">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Loans History Table -->
+                        <div class="dashboard-card" style="padding: 24px;">
+                            <div class="card-header" style="margin-bottom: 20px;">
+                                <h2 style="margin:0;">Historique de mes Emprunts</h2>
+                                <span class="badge" id="stu-loans-count">0 emprunts</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-container" style="max-height: 350px; overflow-y: auto;">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Livre</th>
+                                                <th>Date d'emprunt</th>
+                                                <th>Date limite</th>
+                                                <th>Date de retour</th>
+                                                <th>Statut</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="stu-loans-list">
+                                            <!-- Loaded dynamically -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
@@ -536,6 +656,6 @@
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
     
     <!-- JS App Logic -->
-    <script type="module" src="js/main.js?v=4"></script>
+    <script type="module" src="js/main.js?v=5"></script>
 </body>
 </html>

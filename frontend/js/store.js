@@ -10,7 +10,9 @@ class Store {
             users: [],
             loans: [],
             isOffline: false,
-            activeTab: 'dashboard',
+            activeTab: sessionStorage.getItem('activeTab') || 'dashboard',
+            userRole: sessionStorage.getItem('userRole') || null,
+            activeStudentId: sessionStorage.getItem('activeStudentId') || null,
             searchQueries: {
                 books: '',
                 users: '',
@@ -31,6 +33,13 @@ class Store {
     // Mise à jour de l'état
     setState(key, value) {
         this.state[key] = value;
+        if (['userRole', 'activeStudentId', 'activeTab'].includes(key)) {
+            if (value === null) {
+                sessionStorage.removeItem(key);
+            } else {
+                sessionStorage.setItem(key, value);
+            }
+        }
         this.notify(key, value);
     }
 

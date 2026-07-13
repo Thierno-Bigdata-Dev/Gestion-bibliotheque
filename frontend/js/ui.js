@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=4';
-import { Components } from './components.js?v=4';
-import { ApiService } from './api.js?v=4';
+import { appStore } from './store.js?v=5';
+import { Components } from './components.js?v=5';
+import { ApiService } from './api.js?v=5';
 
 export const UI = {
     init() {
@@ -17,11 +17,26 @@ export const UI = {
         appStore.subscribe('isOffline', isOffline => this.updateConnectionStatus(isOffline));
         appStore.subscribe('activeTab', tabId => this.renderTab(tabId));
         appStore.subscribe('books', books => this.renderBooks(books));
-        appStore.subscribe('users', users => this.renderUsers(users));
+        appStore.subscribe('users', users => {
+            this.renderUsers(users);
+            if (appStore.getState('userRole') === 'public') {
+                this.populateStudentDropdown(users);
+            }
+        });
         appStore.subscribe('loans', loans => {
             this.renderLoans(loans);
             this.renderDashboardStats();
+            const activeStuId = appStore.getState('activeStudentId');
+            if (activeStuId) {
+                this.renderStudentProfile(activeStuId);
+            }
         });
+        appStore.subscribe('userRole', role => this.handleRoleChange(role));
+        appStore.subscribe('activeStudentId', studentId => this.renderStudentProfile(studentId));
+
+        // Initial setup from persisted store
+        const initialRole = appStore.getState('userRole');
+        this.handleRoleChange(initialRole);
     },
 
     cacheDOM() {
@@ -116,12 +131,27 @@ export const UI = {
             return;
         }
 
+        const role = appStore.getState('userRole');
         filtered.forEach(book => {
-            const actions = `
-                <button class="btn-icon btn-icon-danger" onclick="window.App.deleteBook(${book.id})" title="Supprimer">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            `;
+            let actions = '';
+            if (role === 'admin') {
+                actions = `
+                    <button class="btn-icon btn-icon-danger" onclick="window.App.deleteBook(${book.id})" title="Supprimer">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+            } else {
+                const isAvailable = book.available_quantity > 0;
+                actions = isAvailable ? `
+                    <button class="btn btn-primary btn-sm" onclick="window.App.reserveBook('${book.title.replace(/'/g, "\\'")}')" style="padding: 6px 12px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                        <i class="fa-solid fa-calendar-plus"></i> Réserver
+                    </button>
+                ` : `
+                    <button class="btn btn-secondary btn-sm" disabled style="padding: 6px 12px; font-size: 11px; opacity: 0.6;">
+                        Indisponible
+                    </button>
+                `;
+            }
             this.dom.booksList.appendChild(Components.createBookRow(book, actions));
         });
     },
@@ -384,6 +414,110 @@ export const UI = {
         appStore.getState('users').forEach(u => {
             userSelect.innerHTML += `<option value="${u.id}">${Components.escapeHtml(u.first_name)} ${Components.escapeHtml(u.last_name)}</option>`;
         });
+    },
+
+    handleRoleChange(role) {
+        const selector = document.getElementById('portal-selector');
+        const appRoot = document.getElementById('app-root');
+        if (!role) {
+            if (selector) selector.style.display = 'flex';
+            if (appRoot) appRoot.style.display = 'none';
+        } else {
+            if (selector) selector.style.display = 'none';
+            if (appRoot) appRoot.style.display = 'flex';
+            
+            document.body.classList.remove('mode-public', 'mode-admin');
+            document.body.classList.add(`mode-${role}`);
+            
+            const currentTab = appStore.getState('activeTab');
+            if (role === 'public' && (currentTab === 'dashboard' || currentTab === 'users' || currentTab === 'loans')) {
+                appStore.setState('activeTab', 'books');
+            } else if (role === 'admin' && currentTab === 'student-portal') {
+                appStore.setState('activeTab', 'dashboard');
+            }
+            
+            this.renderBooks(appStore.getState('books'));
+            
+            if (role === 'public') {
+                this.populateStudentDropdown(appStore.getState('users'));
+                const activeStudentId = appStore.getState('activeStudentId');
+                if (activeStudentId) {
+                    this.renderStudentProfile(activeStudentId);
+                } else {
+                    const profileView = document.getElementById('student-profile-view');
+                    if (profileView) profileView.classList.add('hidden');
+                    const studentSelect = document.getElementById('student-select');
+                    if (studentSelect) studentSelect.value = '';
+                    const footerName = document.getElementById('active-student-name');
+                    if (footerName) footerName.textContent = 'Lecteur Public';
+                }
+            }
+        }
+    },
+
+    populateStudentDropdown(users) {
+        const select = document.getElementById('student-select');
+        if (!select) return;
+        select.innerHTML = '<option value="">-- Choisir un compte étudiant/enseignant --</option>';
+        users.forEach(u => {
+            select.innerHTML += `<option value="${u.id}">${Components.escapeHtml(u.first_name)} ${Components.escapeHtml(u.last_name)} (${u.role})</option>`;
+        });
+        const activeStudentId = appStore.getState('activeStudentId');
+        if (activeStudentId) {
+            select.value = activeStudentId;
+        }
+    },
+
+    renderStudentProfile(studentId) {
+        const profileView = document.getElementById('student-profile-view');
+        const footerName = document.getElementById('active-student-name');
+        
+        if (!studentId) {
+            if (profileView) profileView.classList.add('hidden');
+            if (footerName) footerName.textContent = 'Lecteur Public';
+            return;
+        }
+
+        const student = appStore.getState('users').find(u => u.id === Number(studentId));
+        if (!student) {
+            if (profileView) profileView.classList.add('hidden');
+            if (footerName) footerName.textContent = 'Lecteur Public';
+            return;
+        }
+
+        if (profileView) profileView.classList.remove('hidden');
+        if (footerName) footerName.textContent = `${student.first_name} ${student.last_name}`;
+
+        document.getElementById('stu-full-name').textContent = `${student.first_name} ${student.last_name}`;
+        document.getElementById('stu-role').textContent = student.role;
+        document.getElementById('stu-email').textContent = student.email;
+        document.getElementById('stu-id').textContent = student.unique_id || `ID-${student.id}`;
+        document.getElementById('stu-created').textContent = student.created_at ? new Date(student.created_at).toLocaleDateString('fr-FR') : '-';
+
+        const loans = appStore.getState('loans').filter(l => l.user_id === Number(studentId));
+        const list = document.getElementById('stu-loans-list');
+        const count = document.getElementById('stu-loans-count');
+
+        if (count) count.textContent = `${loans.length} emprunt${loans.length > 1 ? 's' : ''}`;
+        if (list) {
+            list.innerHTML = '';
+            if (loans.length === 0) {
+                list.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-secondary);padding:24px;">Aucun historique d'emprunts trouvé.</td></tr>`;
+            } else {
+                loans.forEach(loan => {
+                    const tr = document.createElement('tr');
+                    const statusClass = loan.status === 'RETROURNÉ' ? 'badge-success' : (loan.status === 'RETARD' ? 'badge-danger' : 'badge-warning');
+                    tr.innerHTML = `
+                        <td><strong>${Components.escapeHtml(loan.book_title || 'Livre #' + loan.book_id)}</strong></td>
+                        <td>${loan.borrow_date ? new Date(loan.borrow_date).toLocaleDateString('fr-FR') : '-'}</td>
+                        <td>${loan.return_due_date ? new Date(loan.return_due_date).toLocaleDateString('fr-FR') : '-'}</td>
+                        <td>${loan.actual_return_date ? new Date(loan.actual_return_date).toLocaleDateString('fr-FR') : '-'}</td>
+                        <td><span class="badge ${statusClass}">${loan.status}</span></td>
+                    `;
+                    list.appendChild(tr);
+                });
+            }
+        }
     },
 
     startClock() {

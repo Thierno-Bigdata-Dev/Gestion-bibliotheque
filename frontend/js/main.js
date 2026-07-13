@@ -3,16 +3,17 @@
  * Bootstraps the application, links UI and API, and exposes global methods for inline HTML events.
  */
 
-import { ApiService } from './api.js?v=4';
-import { appStore } from './store.js?v=4';
-import { UI } from './ui.js?v=4';
-import { Components } from './components.js?v=4';
+import { ApiService } from './api.js?v=5';
+import { appStore } from './store.js?v=5';
+import { UI } from './ui.js?v=5';
+import { Components } from './components.js?v=5';
 
 class App {
     async init() {
         UI.init();
         await this.loadAllData();
         this.bindForms();
+        this.bindPortalEvents();
         this.startAutoPolling();
     }
 
@@ -201,6 +202,26 @@ class App {
                 Components.showToast(err.message, "danger");
             }
         });
+    }
+
+    bindPortalEvents() {
+        document.getElementById('btn-portal-public')?.addEventListener('click', () => {
+            appStore.setState('userRole', 'public');
+        });
+        document.getElementById('btn-portal-admin')?.addEventListener('click', () => {
+            appStore.setState('userRole', 'admin');
+        });
+        document.getElementById('btn-logout')?.addEventListener('click', () => {
+            appStore.setState('activeStudentId', null);
+            appStore.setState('userRole', null);
+        });
+        document.getElementById('student-select')?.addEventListener('change', (e) => {
+            appStore.setState('activeStudentId', e.target.value || null);
+        });
+    }
+
+    reserveBook(title) {
+        Components.showToast(`Demande de réservation enregistrée pour : "${title}".`, "success");
     }
 
     startAutoPolling() {
