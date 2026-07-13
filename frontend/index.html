@@ -12,33 +12,112 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Data Viz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
-    <!-- Portal Selection Overlay -->
-    <div id="portal-selector" class="portal-selector-overlay">
-        <div class="portal-selector-container">
-            <div class="portal-selector-header">
-                <h2>DIT Library</h2>
-                <p>Système de gestion académique. Veuillez sélectionner votre portail d'accès.</p>
+    <!-- Auth Screen Overlay (Login / Register) -->
+    <div id="auth-screen" class="auth-overlay">
+        <div class="auth-container">
+            <!-- Left: Branding panel -->
+            <div class="auth-brand-panel">
+                <div class="auth-brand-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h1>DIT Library</h1>
+                <p>Système de Gestion Académique<br>Dakar Institute of Technology</p>
+                <div class="auth-brand-stats">
+                    <div class="auth-stat">
+                        <i class="fa-solid fa-book"></i>
+                        <span>Catalogue numérique</span>
+                    </div>
+                    <div class="auth-stat">
+                        <i class="fa-solid fa-users"></i>
+                        <span>Multi-profils</span>
+                    </div>
+                    <div class="auth-stat">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Accès sécurisé</span>
+                    </div>
+                </div>
             </div>
-            <div class="portal-cards-grid">
-                <div class="portal-card" id="btn-portal-public">
-                    <div class="portal-card-icon">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <h3>Portail Étudiant / Lecteur</h3>
-                    <p>Consultez le catalogue des livres en temps réel, vérifiez la disponibilité et accédez à votre espace d'emprunts personnel.</p>
-                    <button class="btn-portal">Accéder au Catalogue</button>
+            <!-- Right: Form panel -->
+            <div class="auth-form-panel">
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tab-login" onclick="authUI.showLoginTab()">Connexion</button>
+                    <button class="auth-tab" id="tab-register" onclick="authUI.showRegisterTab()">Inscription</button>
                 </div>
-                <div class="portal-card" id="btn-portal-admin">
-                    <div class="portal-card-icon">
-                        <i class="fa-solid fa-user-tie"></i>
+
+                <!-- LOGIN FORM -->
+                <form id="form-login" class="auth-form" autocomplete="on">
+                    <div class="auth-form-header">
+                        <h2>Bienvenue !</h2>
+                        <p>Connectez-vous à votre espace personnel</p>
                     </div>
-                    <h3>Espace Administration</h3>
-                    <p>Gérez le catalogue des livres, les profils des utilisateurs, suivez les emprunts physiques et générez des rapports.</p>
-                    <button class="btn-portal">Accéder au Staff</button>
-                </div>
+                    <div class="auth-field">
+                        <label for="login-email"><i class="fa-solid fa-envelope"></i> Adresse email</label>
+                        <input type="email" id="login-email" placeholder="vous@dit.sn" required autocomplete="email">
+                    </div>
+                    <div class="auth-field">
+                        <label for="login-password"><i class="fa-solid fa-lock"></i> Mot de passe</label>
+                        <div class="auth-input-group">
+                            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-password" onclick="authUI.togglePassword('login-password')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="login-error" class="auth-error" style="display:none"></div>
+                    <button type="submit" class="btn-auth-submit" id="btn-login-submit">
+                        <span class="btn-text">Se connecter</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <p class="auth-hint">Compte admin : admin@dit.sn / admin123</p>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="form-register" class="auth-form" style="display:none" autocomplete="on">
+                    <div class="auth-form-header">
+                        <h2>Créer un compte</h2>
+                        <p>Votre compte sera validé par un administrateur</p>
+                    </div>
+                    <div class="auth-fields-row">
+                        <div class="auth-field">
+                            <label for="reg-firstname"><i class="fa-solid fa-user"></i> Prénom</label>
+                            <input type="text" id="reg-firstname" placeholder="Mamadou" required>
+                        </div>
+                        <div class="auth-field">
+                            <label for="reg-lastname"><i class="fa-solid fa-user"></i> Nom</label>
+                            <input type="text" id="reg-lastname" placeholder="Diallo" required>
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="reg-email"><i class="fa-solid fa-envelope"></i> Adresse email</label>
+                        <input type="email" id="reg-email" placeholder="vous@dit.sn" required autocomplete="email">
+                    </div>
+                    <div class="auth-field">
+                        <label for="reg-role"><i class="fa-solid fa-id-badge"></i> Profil</label>
+                        <select id="reg-role" required>
+                            <option value="Etudiant">👨‍🎓 Étudiant</option>
+                            <option value="Enseignant">👨‍🏫 Enseignant</option>
+                        </select>
+                    </div>
+                    <div class="auth-field">
+                        <label for="reg-password"><i class="fa-solid fa-lock"></i> Mot de passe</label>
+                        <div class="auth-input-group">
+                            <input type="password" id="reg-password" placeholder="Min. 6 caractères" required autocomplete="new-password" minlength="6">
+                            <button type="button" class="btn-toggle-password" onclick="authUI.togglePassword('reg-password')">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="register-error" class="auth-error" style="display:none"></div>
+                    <div id="register-success" class="auth-success" style="display:none"></div>
+                    <button type="submit" class="btn-auth-submit" id="btn-register-submit">
+                        <span class="btn-text">Créer mon compte</span>
+                        <i class="fa-solid fa-user-plus"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -656,6 +735,6 @@
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
     
     <!-- JS App Logic -->
-    <script type="module" src="js/main.js?v=5"></script>
+    <script type="module" src="js/main.js?v=6"></script>
 </body>
 </html>

@@ -3,13 +3,15 @@
  * Bootstraps the application, links UI and API, and exposes global methods for inline HTML events.
  */
 
-import { ApiService } from './api.js?v=5';
-import { appStore } from './store.js?v=5';
-import { UI } from './ui.js?v=5';
-import { Components } from './components.js?v=5';
+import { ApiService } from './api.js?v=6';
+import { appStore } from './store.js?v=6';
+import { UI } from './ui.js?v=6';
+import { Components } from './components.js?v=6';
+import { AuthUI } from './auth.js?v=6';
 
 class App {
     async init() {
+        AuthUI.init();           // Show auth screen or restore session
         UI.init();
         await this.loadAllData();
         this.bindForms();
@@ -205,16 +207,11 @@ class App {
     }
 
     bindPortalEvents() {
-        document.getElementById('btn-portal-public')?.addEventListener('click', () => {
-            appStore.setState('userRole', 'public');
-        });
-        document.getElementById('btn-portal-admin')?.addEventListener('click', () => {
-            appStore.setState('userRole', 'admin');
-        });
+        // Logout (also called by AuthUI directly)
         document.getElementById('btn-logout')?.addEventListener('click', () => {
-            appStore.setState('activeStudentId', null);
-            appStore.setState('userRole', null);
+            AuthUI.logout();
         });
+        // Student profile selector
         document.getElementById('student-select')?.addEventListener('change', (e) => {
             appStore.setState('activeStudentId', e.target.value || null);
         });

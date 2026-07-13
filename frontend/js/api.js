@@ -1,35 +1,55 @@
 /**
  * API Service Layer
  * Handles all network requests, retries, and formatting.
+ * Supports JWT authentication via Authorization header.
  */
 
 const API_URLS = {
     books: '/api/books',
     users: '/api/users',
-    loans: '/api/loans'
+    loans: '/api/loans',
+    auth: '/api/users/auth'
 };
 
 export const ApiService = {
+    // ─────────────────────────────────────────────
+    // CORE REQUEST METHOD
+    // ─────────────────────────────────────────────
     async request(url, options = {}) {
-        const timeout = 6000;
+        const timeout = 8000;
         const controller = new AbortController();
         const id = setTimeout(() => controller.abort(), timeout);
-        
+
+        // Auto-inject JWT token if present
+        const token = localStorage.getItem('authToken');
+        const defaultHeaders = { 'Content-Type': 'application/json' };
+        if (token) {
+            defaultHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
         const defaultOptions = {
-            headers: { 'Content-Type': 'application/json' },
+            headers: { ...defaultHeaders, ...(options.headers || {}) },
             signal: controller.signal
         };
-        
+
         try {
-            const response = await fetch(url, { ...defaultOptions, ...options });
+            const response = await fetch(url, { ...options, ...defaultOptions });
             clearTimeout(id);
-            
+
             let data = null;
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.includes("application/json")) {
                 data = await response.json();
             }
-            
+
+            if (response.status === 401) {
+                // Token expired or invalid → force logout
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                window.location.reload();
+                throw new Error('Session expirée. Veuillez vous reconnecter.');
+            }
+
             if (!response.ok) {
                 const errMsg = (data && data.error) ? data.error : `HTTP ${response.status}`;
                 throw new Error(errMsg);
@@ -44,7 +64,30 @@ export const ApiService = {
         }
     },
 
-    // Resources specifics
+    // ─────────────────────────────────────────────
+    // AUTH METHODS
+    // ─────────────────────────────────────────────
+    async login(email, password) {
+        return this.request(`${API_URLS.auth}/login`, {
+            method: 'POST',
+            body: JSON.stringify({ email, password })
+        });
+    },
+
+    async register(data) {
+        return this.request(`${API_URLS.auth}/register`, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    },
+
+    async getMe() {
+        return this.request(`${API_URLS.auth}/me`);
+    },
+
+    // ─────────────────────────────────────────────
+    // BOOKS
+    // ─────────────────────────────────────────────
     async getBooks() {
         return this.request(API_URLS.books);
     },
@@ -55,16 +98,37 @@ export const ApiService = {
         return this.request(`${API_URLS.books}/${id}`, { method: 'DELETE' });
     },
 
+    // ─────────────────────────────────────────────
+    // USERS
+    // ─────────────────────────────────────────────
     async getUsers() {
         return this.request(API_URLS.users);
     },
+    async getPendingUsers() {
+        return this.request(`${API_URLS.users}/pending`);
+    },
+    async getAllUsers() {
+        return this.request(`${API_URLS.users}/all`);
+    },
     async createUser(data) {
         return this.request(API_URLS.users, { method: 'POST', body: JSON.stringify(data) });
+    },
+    async validateUser(id) {
+        return this.request(`${API_URLS.users}/${id}/validate`, { method: 'PUT' });
+    },
+    async rejectUser(id) {
+        return this.request(`${API_URLS.users}/${id}/reject`, { method: 'PUT' });
+    },
+    async suspendUser(id) {
+        return this.request(`${API_URLS.users}/${id}/suspend`, { method: 'PUT' });
     },
     async deleteUser(id) {
         return this.request(`${API_URLS.users}/${id}`, { method: 'DELETE' });
     },
 
+    // ─────────────────────────────────────────────
+    // LOANS
+    // ─────────────────────────────────────────────
     async getLoans() {
         return this.request(API_URLS.loans);
     },

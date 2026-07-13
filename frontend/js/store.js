@@ -13,6 +13,8 @@ class Store {
             activeTab: sessionStorage.getItem('activeTab') || 'dashboard',
             userRole: sessionStorage.getItem('userRole') || null,
             activeStudentId: sessionStorage.getItem('activeStudentId') || null,
+            currentUser: JSON.parse(localStorage.getItem('currentUser') || 'null'),
+            authToken: localStorage.getItem('authToken') || null,
             searchQueries: {
                 books: '',
                 users: '',
