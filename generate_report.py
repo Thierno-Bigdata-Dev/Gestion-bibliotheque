@@ -273,7 +273,7 @@ def create_report(output_filename="Rapport_Projet_Bibliotheque.pdf"):
     story.append(Paragraph("<b>4. Déploiement Automatique :</b> Exécute <code>docker compose down</code> suivi de <code>docker compose up -d</code>. Jenkins s'assure ainsi d'une mise à jour sans interruption prolongée des services. Une vérification <code>docker compose ps</code> valide que tous les services sont démarrés.", bullet_style))
     
     story.append(Spacer(1, 10))
-    story.append(Paragraph("4.2 Extrait du Jenkinsfile", h2_style))
+    story.append(Paragraph("4.2 Extrait du Jenkins & Pipeline", h2_style))
     story.append(Paragraph(
         "pipeline {\n"
         "    agent any\n"
@@ -284,6 +284,18 @@ def create_report(output_filename="Rapport_Projet_Bibliotheque.pdf"):
         "        stage('Deploy') { steps { sh 'docker compose down && docker compose up -d' } }\n"
         "    }\n"
         "}", code_style))
+    
+    screenshot_dir = "screenshots"
+    jenkins_img_path = os.path.join(screenshot_dir, "jenkins_pipeline.png")
+    if os.path.exists(jenkins_img_path):
+        try:
+            story.append(Spacer(1, 10))
+            story.append(Image(jenkins_img_path, width=460, height=200))
+            story.append(Spacer(1, 5))
+            story.append(Paragraph("<i>Figure 5 : Stage View du pipeline Jenkins CI/CD exécuté avec succès</i>", ParagraphStyle('Cap', fontName='Helvetica-Oblique', fontSize=8, alignment=TA_CENTER, textColor=colors.HexColor('#64748b'))))
+        except Exception as e:
+            print(f"Erreur d'intégration de l'image Jenkins: {e}")
+            
     story.append(PageBreak())
     
     # ------------------ PAGE 6: CAPTURES D'ECRAN DE L'APPLICATION ------------------
