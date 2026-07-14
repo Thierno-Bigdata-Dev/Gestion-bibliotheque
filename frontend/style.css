@@ -1558,56 +1558,183 @@ input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus,
 }
 
 /* ------------------------------------------------------------- */
-/* STUDENT PORTAL tab styling                                    */
+/* STUDENT PORTAL — Design System                               */
 /* ------------------------------------------------------------- */
-.student-portal-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 24px;
+
+/* Welcome Banner */
+.portal-banner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.07));
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 14px;
+    padding: 20px 24px;
+    flex-wrap: wrap;
 }
 
-.student-login-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    padding: 32px;
-    margin-bottom: 32px;
+.portal-banner-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(99,102,241,0.35);
+}
+
+.portal-banner-text {
+    flex: 1;
+    min-width: 140px;
+}
+
+.portal-banner-text h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.portal-banner-text p {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.portal-stats {
+    display: flex;
+    gap: 28px;
     text-align: center;
-    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
 }
 
-.student-login-card h3 {
-    font-size: 20px;
-    margin-bottom: 8px;
+.portal-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.student-login-card p {
+.portal-stat-num {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.portal-stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Section Blocks */
+.portal-section {
+    margin-bottom: 36px;
+}
+
+.portal-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.portal-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+}
+
+.portal-section-sub {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Chip Filters */
+.portal-filter-chips {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.chip {
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.chip:hover {
+    border-color: #6366f1;
+    color: #818cf8;
+}
+
+.chip.chip-active {
+    background: rgba(99,102,241,0.15);
+    border-color: #6366f1;
+    color: #818cf8;
+}
+
+/* Loans table */
+.portal-table-wrap {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+/* Empty state cell */
+.empty-cell {
+    text-align: center;
+    padding: 48px 20px;
     color: var(--text-secondary);
     font-size: 14px;
-    margin-bottom: 24px;
 }
 
-.student-login-card .form-group {
-    max-width: 400px;
-    margin: 0 auto;
+/* Badges */
+.badge-indigo {
+    background: rgba(99,102,241,0.18);
+    color: #818cf8;
+    border: 1px solid rgba(99,102,241,0.25);
 }
 
-.student-profile-view {
+.badge-green {
+    background: rgba(16,185,129,0.15);
+    color: #34d399;
+    border: 1px solid rgba(16,185,129,0.25);
+}
+
+/* Available books grid */
+.portal-books-grid {
     display: grid;
-    grid-template-columns: 320px 1fr;
-    gap: 32px;
-    animation: fadeIn 0.4s ease-out;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
 }
 
-.student-profile-view.hidden {
-    display: none !important;
+/* Responsive */
+@media (max-width: 640px) {
+    .portal-banner { flex-direction: column; }
+    .portal-stats  { gap: 20px; }
+    .portal-section-head { flex-direction: column; }
+    .portal-books-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 992px) {
-    .student-profile-view {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* ------------------------------------------------------------- */
 /* SKELETON LOADERS & BUTTON STATES (PROD-READY UI)             */

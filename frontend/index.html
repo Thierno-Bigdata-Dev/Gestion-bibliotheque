@@ -543,53 +543,59 @@
                         </thead>
                         <tbody id="all-accounts-body">
                         </tbody>
-                      <!-- Student / Teacher Portal -->
+                    </table>
+                </div><!-- /.table-container -->
+            </section><!-- /#tab-users -->
+
+            <!-- ══════════════════════════════════════════════════ -->
+            <!-- Student / Teacher Portal                          -->
+            <!-- ══════════════════════════════════════════════════ -->
             <section id="tab-student-portal" class="tab-content" role="tabpanel">
 
                 <!-- Welcome Banner -->
-                <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:20px 24px;flex-wrap:wrap;">
-                    <div style="width:52px;height:52px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0;">
+                <div class="portal-banner">
+                    <div class="portal-banner-icon">
                         <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
                     </div>
-                    <div style="flex:1;min-width:160px;">
-                        <h2 style="font-size:18px;font-weight:700;margin-bottom:2px;" id="portal-welcome-title">Mon Espace</h2>
-                        <p style="color:var(--text-secondary);font-size:13px;" id="portal-welcome-sub">Gérez vos emprunts et explorez les livres disponibles.</p>
+                    <div class="portal-banner-text">
+                        <h2 id="portal-welcome-title">Mon Espace</h2>
+                        <p id="portal-welcome-sub">Gérez vos emprunts et explorez les livres disponibles.</p>
                     </div>
-                    <div style="display:flex;gap:24px;text-align:center;flex-shrink:0;">
-                        <div>
-                            <div style="font-size:24px;font-weight:800;color:#6366f1;" id="portal-stat-active">0</div>
-                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">En cours</div>
+                    <div class="portal-stats">
+                        <div class="portal-stat">
+                            <span class="portal-stat-num" id="portal-stat-active" style="color:#6366f1;">0</span>
+                            <span class="portal-stat-label">En cours</span>
                         </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:800;color:#ef4444;" id="portal-stat-overdue">0</div>
-                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">En retard</div>
+                        <div class="portal-stat">
+                            <span class="portal-stat-num" id="portal-stat-overdue" style="color:#ef4444;">0</span>
+                            <span class="portal-stat-label">En retard</span>
                         </div>
-                        <div>
-                            <div style="font-size:24px;font-weight:800;color:#10b981;" id="portal-stat-returned">0</div>
-                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Retournés</div>
+                        <div class="portal-stat">
+                            <span class="portal-stat-num" id="portal-stat-returned" style="color:#10b981;">0</span>
+                            <span class="portal-stat-label">Retournés</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Section 1 : Mes Emprunts -->
-                <div style="margin-bottom:40px;">
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                <div class="portal-section">
+                    <div class="portal-section-head">
                         <div>
-                            <h2 style="font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                            <h2 class="portal-section-title">
                                 <i class="fa-solid fa-handshake" style="color:#6366f1;" aria-hidden="true"></i>
                                 Mes Emprunts
-                                <span class="badge" id="my-loans-count" style="background:#6366f1;color:#fff;">0</span>
+                                <span class="badge badge-indigo" id="my-loans-count">0</span>
                             </h2>
-                            <p style="color:var(--text-secondary);font-size:13px;">Livres actuellement empruntés et historique complet.</p>
+                            <p class="portal-section-sub">Livres empruntés et historique complet.</p>
                         </div>
-                        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="loans-filter-chips">
-                            <button class="btn btn-primary btn-sm" data-lfilter="all" onclick="window.App.filterMyLoans('all')">Tous</button>
-                            <button class="btn btn-secondary btn-sm" data-lfilter="active" onclick="window.App.filterMyLoans('active')">En cours</button>
-                            <button class="btn btn-secondary btn-sm" data-lfilter="overdue" onclick="window.App.filterMyLoans('overdue')">En retard</button>
-                            <button class="btn btn-secondary btn-sm" data-lfilter="returned" onclick="window.App.filterMyLoans('returned')">Retournés</button>
+                        <div class="portal-filter-chips" id="loans-filter-chips">
+                            <button class="chip chip-active" data-lfilter="all" onclick="window.App.filterMyLoans('all')">Tous</button>
+                            <button class="chip" data-lfilter="active" onclick="window.App.filterMyLoans('active')">En cours</button>
+                            <button class="chip" data-lfilter="overdue" onclick="window.App.filterMyLoans('overdue')">En retard</button>
+                            <button class="chip" data-lfilter="returned" onclick="window.App.filterMyLoans('returned')">Retournés</button>
                         </div>
                     </div>
-                    <div class="table-container">
+                    <div class="table-container portal-table-wrap">
                         <table class="data-table">
                             <thead>
                                 <tr>
@@ -601,8 +607,9 @@
                                 </tr>
                             </thead>
                             <tbody id="my-loans-list">
-                                <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-secondary);">
-                                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size:24px;margin-bottom:12px;display:block;"></i>Chargement...
+                                <tr><td colspan="5" class="empty-cell">
+                                    <i class="fa-solid fa-handshake" style="font-size:28px;opacity:0.2;display:block;margin-bottom:10px;"></i>
+                                    Aucun emprunt enregistré.
                                 </td></tr>
                             </tbody>
                         </table>
@@ -610,22 +617,22 @@
                 </div>
 
                 <!-- Section 2 : Livres Disponibles -->
-                <div>
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                <div class="portal-section">
+                    <div class="portal-section-head">
                         <div>
-                            <h2 style="font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                            <h2 class="portal-section-title">
                                 <i class="fa-solid fa-book-open" style="color:#10b981;" aria-hidden="true"></i>
                                 Livres Disponibles
-                                <span class="badge" id="available-books-count" style="background:#10b981;color:#fff;">0</span>
+                                <span class="badge badge-green" id="available-books-count">0</span>
                             </h2>
-                            <p style="color:var(--text-secondary);font-size:13px;">Ouvrages disponibles que vous pouvez emprunter.</p>
+                            <p class="portal-section-sub">Ouvrages que vous pouvez emprunter.</p>
                         </div>
-                        <div class="search-box" style="max-width:300px;">
+                        <div class="search-box" style="max-width:280px;flex-shrink:0;">
                             <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                            <input type="text" id="search-available-books" placeholder="Rechercher…" autocomplete="off">
+                            <input type="text" id="search-available-books" placeholder="Rechercher un livre…" autocomplete="off">
                         </div>
                     </div>
-                    <div id="available-books-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:18px;">
+                    <div id="available-books-grid" class="portal-books-grid">
                         <!-- filled dynamically -->
                     </div>
                 </div>
@@ -633,6 +640,7 @@
             </section>
         </main>
     </div>
+
 
     <!-- Modals Section -->
 
