@@ -141,13 +141,9 @@ export const AuthUI = {
         this._showAuthScreen();
     },
 
-    enterAsVisitor() {
-        appStore.setState('userRole', 'public');
-        appStore.setState('currentUser', null);
-        this._hideAuthScreen();
-        appStore.setState('activeStudentId', null);
-        appStore.setState('activeTab', 'catalog');
-        Components.showToast("Accès Visiteur activé. Connectez-vous pour emprunter.", "info");
+    // Catalogue public — now a separate page
+    goToCatalog() {
+        window.location.href = 'catalogue.html';
     },
 
     // ─────────────────────────────────────────────

@@ -650,8 +650,8 @@ export const UI = {
             document.body.classList.add(`mode-${role}`);
             
             const currentTab = appStore.getState('activeTab');
-            if (role === 'public' && (currentTab === 'dashboard' || currentTab === 'users' || currentTab === 'loans' || currentTab === 'books')) {
-                appStore.setState('activeTab', 'catalog');
+            if (role === 'public' && (currentTab === 'dashboard' || currentTab === 'users' || currentTab === 'loans' || currentTab === 'books' || currentTab === 'catalog')) {
+                appStore.setState('activeTab', 'student-portal');
             } else if (role === 'admin' && (currentTab === 'student-portal' || currentTab === 'catalog')) {
                 appStore.setState('activeTab', 'dashboard');
             }

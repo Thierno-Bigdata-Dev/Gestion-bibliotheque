@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalogue Public — DIT Library</title>
+    <meta name="description" content="Consultez le catalogue numérique de la bibliothèque du Dakar Institute of Technology. Découvrez nos ouvrages en Informatique, Big Data, Marketing Digital et Littérature.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ── Reset & Base ── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Outfit', -apple-system, sans-serif;
+            background: #080e1a;
+            color: #f0f4ff;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Variables ── */
+        :root {
+            --primary:       #6366f1;
+            --primary-light: #818cf8;
+            --primary-alpha: rgba(99,102,241,0.15);
+            --bg-secondary:  #0e1829;
+            --bg-tertiary:   #162033;
+            --bg-elevated:   #1a2640;
+            --border:        #1e2d45;
+            --border-hover:  #2a3f5f;
+            --text-primary:  #f0f4ff;
+            --text-secondary:#7d93b5;
+            --text-muted:    #4a5e7a;
+            --success:       #10b981;
+            --success-bg:    rgba(16,185,129,0.12);
+            --success-border:rgba(16,185,129,0.25);
+            --warning:       #f59e0b;
+            --danger:        #ef4444;
+            --danger-bg:     rgba(239,68,68,0.12);
+            --radius-sm:     6px;
+            --radius-md:     10px;
+            --radius-lg:     16px;
+            --radius-xl:     24px;
+            --radius-full:   9999px;
+            --shadow-md:     0 4px 16px rgba(0,0,0,0.5);
+            --shadow-lg:     0 10px 40px rgba(0,0,0,0.6);
+            --glow-primary:  0 0 24px rgba(99,102,241,0.35);
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: rgba(8,14,26,0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            padding: 0 40px;
+            height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .topbar-brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; color: inherit;
+        }
+
+        .topbar-brand .logo {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff;
+            box-shadow: var(--glow-primary);
+        }
+
+        .topbar-brand h1 {
+            font-size: 18px; font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .topbar-brand span {
+            font-size: 11px; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1px;
+            display: block;
+        }
+
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+        .btn-login {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff; border: none;
+            padding: 10px 20px; border-radius: var(--radius-md);
+            font-size: 14px; font-weight: 600; font-family: inherit;
+            cursor: pointer; text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md), var(--glow-primary);
+            color: #fff; text-decoration: none;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #0a1628 0%, #0e1829 50%, #1a0933 100%);
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            position: relative; overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(circle at 30% 50%, rgba(99,102,241,0.08), transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(139,92,246,0.06), transparent 40%);
+            pointer-events: none;
+        }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--primary-alpha);
+            border: 1px solid rgba(99,102,241,0.25);
+            color: var(--primary-light);
+            border-radius: var(--radius-full);
+            padding: 6px 16px; font-size: 13px; font-weight: 600;
+            margin-bottom: 20px;
+            position: relative; z-index: 1;
+        }
+
+        .hero h2 {
+            font-size: clamp(28px, 4vw, 44px);
+            font-weight: 800; letter-spacing: -1px;
+            margin-bottom: 12px;
+            position: relative; z-index: 1;
+        }
+
+        .hero p {
+            color: var(--text-secondary); font-size: 16px;
+            max-width: 520px; margin: 0 auto 28px;
+            line-height: 1.7;
+            position: relative; z-index: 1;
+        }
+
+        /* ── SEARCH BAR ── */
+        .search-wrap {
+            max-width: 500px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        .search-bar {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--bg-secondary);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-alpha);
+        }
+
+        .search-bar i { color: var(--text-muted); }
+
+        .search-bar input {
+            flex: 1; background: transparent;
+            border: none; outline: none;
+            color: var(--text-primary); font-size: 15px; font-family: inherit;
+        }
+
+        .search-bar input::placeholder { color: var(--text-muted); }
+
+        /* ── CATEGORY FILTERS ── */
+        .filter-bar {
+            display: flex; align-items: center; gap: 10px;
+            padding: 16px 40px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            background: var(--bg-secondary);
+            flex-wrap: wrap;
+        }
+
+        .filter-bar span {
+            font-size: 12px; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px; white-space: nowrap;
+        }
+
+        .filter-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: var(--radius-full);
+            border: 1px solid var(--border);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-size: 13px; font-weight: 600; font-family: inherit;
+            cursor: pointer; white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary-light);
+            background: var(--primary-alpha);
+        }
+
+        .filter-btn.active {
+            border-color: var(--primary);
+            background: var(--primary-alpha);
+            color: var(--primary-light);
+        }
+
+        .filter-badge {
+            background: var(--primary);
+            color: #fff;
+            border-radius: var(--radius-full);
+            font-size: 10px; font-weight: 700;
+            padding: 1px 6px; min-width: 18px;
+            text-align: center;
+        }
+
+        /* ── MAIN CONTENT ── */
+        .main {
+            max-width: 1400px; margin: 0 auto;
+            padding: 40px;
+        }
+
+        /* ── CATALOG SECTIONS ── */
+        .catalog-section { margin-bottom: 56px; }
+
+        .catalog-section-title {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 20px; font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .catalog-section-title i {
+            font-size: 20px; color: var(--primary-light);
+        }
+
+        .cat-count {
+            margin-left: auto;
+            background: var(--primary-alpha);
+            color: var(--primary-light);
+            border-radius: var(--radius-full);
+            font-size: 12px; font-weight: 600;
+            padding: 2px 10px; border: 1px solid rgba(99,102,241,0.2);
+        }
+
+        /* ── BOOK GRID ── */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 20px;
+        }
+
+        /* ── BOOK CARD ── */
+        .book-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .book-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg), var(--glow-primary);
+        }
+
+        .book-card:focus-visible {
+            outline: 2px solid #f59e0b;
+            outline-offset: 3px;
+        }
+
+        .book-cover {
+            height: 165px;
+            background: var(--bg-tertiary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 44px; color: var(--text-muted);
+            overflow: hidden; flex-shrink: 0;
+            position: relative;
+        }
+
+        .book-cover img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .book-card:hover .book-cover img { transform: scale(1.05); }
+
+        .availability-badge {
+            position: absolute; top: 8px; right: 8px;
+            font-size: 10px; font-weight: 700;
+            padding: 3px 8px; border-radius: var(--radius-full);
+            text-transform: uppercase; letter-spacing: 0.3px;
+        }
+
+        .avail-yes {
+            background: var(--success-bg);
+            color: #34d399;
+            border: 1px solid var(--success-border);
+        }
+
+        .avail-no {
+            background: var(--danger-bg);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+
+        .book-body {
+            padding: 14px;
+            flex: 1; display: flex; flex-direction: column; gap: 6px;
+        }
+
+        .book-cat {
+            font-size: 10px; font-weight: 700;
+            color: var(--primary-light); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .book-title {
+            font-weight: 700; font-size: 13px;
+            line-height: 1.4; flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-author {
+            font-size: 11px; color: var(--text-secondary);
+        }
+
+        .book-isbn {
+            font-size: 10px; color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .btn-borrow {
+            margin-top: 10px;
+            width: 100%;
+            padding: 9px 12px;
+            border-radius: var(--radius-sm);
+            border: none; font-size: 12px;
+            font-weight: 700; font-family: inherit;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-borrow-active {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+        }
+
+        .btn-borrow-active:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(99,102,241,0.45);
+        }
+
+        .btn-borrow-disabled {
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            border: 1px solid var(--border);
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            text-align: center; padding: 80px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .empty-icon {
+            width: 80px; height: 80px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-xl);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; color: var(--text-muted);
+            margin: 0 auto 20px;
+            border: 1px solid var(--border);
+        }
+
+        .empty-state h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-secondary); font-size: 14px; }
+
+        /* ── LOADING ── */
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position:  200% 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #162033 25%, #1a2640 50%, #162033 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+            border-radius: var(--radius-sm);
+        }
+
+        .skeleton-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .skeleton-cover {
+            height: 165px;
+        }
+
+        .skeleton-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+        .skeleton-line { height: 12px; border-radius: 6px; }
+
+        /* ── LOGIN MODAL ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 200; padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 40px 36px;
+            max-width: 440px; width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-icon {
+            width: 72px; height: 72px;
+            background: var(--primary-alpha);
+            border-radius: var(--radius-xl);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 32px; color: var(--primary-light);
+            margin: 0 auto 20px;
+            border: 1px solid rgba(99,102,241,0.25);
+        }
+
+        .modal-box h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+        .modal-box p { color: var(--text-secondary); font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
+
+        .modal-actions { display: flex; flex-direction: column; gap: 10px; }
+
+        .btn-modal-primary {
+            width: 100%; padding: 13px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff; border: none; border-radius: var(--radius-md);
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+            text-decoration: none;
+        }
+
+        .btn-modal-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md), var(--glow-primary);
+            color: #fff; text-decoration: none;
+        }
+
+        .btn-modal-secondary {
+            width: 100%; padding: 11px;
+            background: transparent;
+            color: var(--text-secondary); border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px; font-weight: 500; font-family: inherit;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+
+        .btn-modal-secondary:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .book-title-hint {
+            font-size: 13px; font-weight: 600;
+            color: var(--primary-light);
+            background: var(--primary-alpha);
+            border: 1px solid rgba(99,102,241,0.2);
+            border-radius: var(--radius-sm);
+            padding: 6px 12px; margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            text-align: center;
+            padding: 24px 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        footer a { color: var(--primary-light); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .topbar { padding: 0 20px; }
+            .hero { padding: 40px 20px; }
+            .filter-bar { padding: 12px 20px; }
+            .main { padding: 24px 20px; }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 14px; }
+        }
+
+        @media (max-width: 480px) {
+            .books-grid { grid-template-columns: repeat(2, 1fr); }
+            .topbar-brand span { display: none; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #080e1a; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 9999px; }
+    </style>
+</head>
+<body>
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <a href="index.html" class="topbar-brand">
+            <div class="logo"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div>
+                <h1>DIT Library</h1>
+                <span>Catalogue Public</span>
+            </div>
+        </a>
+        <div class="topbar-right">
+            <a href="index.html" class="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                Se connecter
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-badge">
+            <i class="fa-solid fa-book-open"></i>
+            Catalogue Numérique — Dakar Institute of Technology
+        </div>
+        <h2>Explorez notre Bibliothèque</h2>
+        <p>Découvrez l'ensemble de nos ouvrages disponibles. Connectez-vous pour emprunter un livre.</p>
+
+        <div class="search-wrap">
+            <div class="search-bar">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" placeholder="Rechercher un titre, auteur, ISBN…" autocomplete="off">
+            </div>
+        </div>
+    </section>
+
+    <!-- FILTER BAR -->
+    <nav class="filter-bar" aria-label="Filtres par catégorie">
+        <span>Catégorie :</span>
+        <button class="filter-btn active" data-cat="all" onclick="setFilter('all')">
+            <i class="fa-solid fa-border-all"></i> Tous
+            <span class="filter-badge" id="badge-all">0</span>
+        </button>
+        <button class="filter-btn" data-cat="Informatique &amp; Big Data" onclick="setFilter('Informatique &amp; Big Data')">
+            <i class="fa-solid fa-laptop-code"></i> Informatique &amp; Big Data
+            <span class="filter-badge" id="badge-info">0</span>
+        </button>
+        <button class="filter-btn" data-cat="Marketing Digital" onclick="setFilter('Marketing Digital')">
+            <i class="fa-solid fa-bullhorn"></i> Marketing Digital
+            <span class="filter-badge" id="badge-mktg">0</span>
+        </button>
+        <button class="filter-btn" data-cat="Littérature" onclick="setFilter('Littérature')">
+            <i class="fa-solid fa-feather-pointed"></i> Littérature
+            <span class="filter-badge" id="badge-lit">0</span>
+        </button>
+        <button class="filter-btn" data-cat="Autre" onclick="setFilter('Autre')">
+            <i class="fa-solid fa-bookmark"></i> Autre
+            <span class="filter-badge" id="badge-other">0</span>
+        </button>
+    </nav>
+
+    <!-- CATALOG CONTENT -->
+    <main class="main" id="catalog-main">
+        <!-- Filled by JS -->
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        © 2024 DIT Library — Dakar Institute of Technology &nbsp;|&nbsp;
+        <a href="index.html"><i class="fa-solid fa-right-to-bracket"></i> Accéder à mon espace</a>
+    </footer>
+
+    <!-- BORROW REDIRECT MODAL -->
+    <div id="borrow-modal" class="modal-overlay" style="display:none" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-box">
+            <div class="modal-icon">
+                <i class="fa-solid fa-book-reader"></i>
+            </div>
+            <h3 id="modal-title">Connexion requise</h3>
+            <p id="modal-book-hint" class="book-title-hint"></p>
+            <p>Pour emprunter un ouvrage, vous devez être connecté à votre espace étudiant ou enseignant.</p>
+            <div class="modal-actions">
+                <a href="index.html" class="btn-modal-primary">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Se connecter / S'inscrire
+                </a>
+                <button class="btn-modal-secondary" onclick="closeModal()">
+                    Continuer la navigation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── State ──────────────────────────────────────
+        let allBooks   = [];
+        let activeFilter = 'all';
+        let searchQuery  = '';
+
+        // ── API ────────────────────────────────────────
+        const API_BASE = '/api/books/books';
+
+        async function fetchBooks() {
+            try {
+                const res = await fetch(API_BASE);
+                if (!res.ok) throw new Error('API error');
+                return await res.json();
+            } catch {
+                return null;
+            }
+        }
+
+        // ── Helpers ────────────────────────────────────
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function getCategoryIcon(cat) {
+            const map = {
+                'Informatique & Big Data': 'fa-laptop-code',
+                'Marketing Digital':       'fa-bullhorn',
+                'Littérature':             'fa-feather-pointed',
+            };
+            return map[cat] || 'fa-bookmark';
+        }
+
+        // ── Filter ─────────────────────────────────────
+        function setFilter(cat) {
+            activeFilter = cat;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.cat === cat);
+            });
+            render();
+        }
+
+        // ── Badges ─────────────────────────────────────
+        function updateBadges(books) {
+            const count = (cat) => books.filter(b => (b.category || 'Autre') === cat).length;
+            document.getElementById('badge-all').textContent   = books.length;
+            document.getElementById('badge-info').textContent  = count('Informatique & Big Data');
+            document.getElementById('badge-mktg').textContent  = count('Marketing Digital');
+            document.getElementById('badge-lit').textContent   = count('Littérature');
+            document.getElementById('badge-other').textContent = count('Autre');
+        }
+
+        // ── Render ─────────────────────────────────────
+        function render() {
+            const main = document.getElementById('catalog-main');
+            const q = searchQuery.toLowerCase();
+
+            // Apply search
+            let filtered = allBooks.filter(b => {
+                const match = (
+                    b.title?.toLowerCase().includes(q) ||
+                    b.author?.toLowerCase().includes(q) ||
+                    b.isbn?.toLowerCase().includes(q)
+                );
+                const catOk = activeFilter === 'all' || (b.category || 'Autre') === activeFilter;
+                return match && catOk;
+            });
+
+            if (filtered.length === 0) {
+                main.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fa-solid fa-book-open"></i></div>
+                        <h3>${q || activeFilter !== 'all' ? 'Aucun résultat' : 'Catalogue vide'}</h3>
+                        <p>${q ? `Aucun ouvrage ne correspond à "${escapeHtml(q)}".` : 'Aucun livre disponible pour le moment.'}</p>
+                    </div>`;
+                return;
+            }
+
+            // Group by category
+            const ORDER = ['Informatique & Big Data', 'Marketing Digital', 'Littérature', 'Autre'];
+            const groups = {};
+            filtered.forEach(b => {
+                const cat = b.category || 'Autre';
+                if (!groups[cat]) groups[cat] = [];
+                groups[cat].push(b);
+            });
+
+            const sortedCats = [
+                ...ORDER.filter(c => groups[c]),
+                ...Object.keys(groups).filter(c => !ORDER.includes(c))
+            ];
+
+            // If filtering by one category, no need for section headers
+            if (activeFilter !== 'all') {
+                main.innerHTML = `<div class="books-grid" id="single-grid"></div>`;
+                const grid = document.getElementById('single-grid');
+                filtered.forEach(b => grid.appendChild(createCard(b)));
+                return;
+            }
+
+            main.innerHTML = sortedCats.map(cat => `
+                <section class="catalog-section">
+                    <h2 class="catalog-section-title">
+                        <i class="fa-solid ${getCategoryIcon(cat)}"></i>
+                        ${escapeHtml(cat)}
+                        <span class="cat-count">${groups[cat].length} ouvrage${groups[cat].length > 1 ? 's' : ''}</span>
+                    </h2>
+                    <div class="books-grid" id="grid-${encodeURIComponent(cat)}"></div>
+                </section>
+            `).join('');
+
+            sortedCats.forEach(cat => {
+                const grid = document.getElementById(`grid-${encodeURIComponent(cat)}`);
+                if (grid) groups[cat].forEach(b => grid.appendChild(createCard(b)));
+            });
+        }
+
+        // ── Create Card ────────────────────────────────
+        function createCard(book) {
+            const div = document.createElement('div');
+            div.className = 'book-card';
+            div.setAttribute('tabindex', '0');
+            div.setAttribute('role', 'article');
+            div.setAttribute('aria-label', `${book.title} par ${book.author}`);
+
+            const isAvail = book.available_quantity > 0;
+            const cat = book.category || 'Autre';
+
+            let imgHtml = book.image_url
+                ? `<img src="${escapeHtml(book.image_url)}" alt="Couverture: ${escapeHtml(book.title)}" loading="lazy" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-book\\'></i>'">`
+                : `<i class="fa-solid fa-book"></i>`;
+
+            div.innerHTML = `
+                <div class="book-cover">
+                    ${imgHtml}
+                    <span class="availability-badge ${isAvail ? 'avail-yes' : 'avail-no'}">
+                        ${isAvail ? `✓ ${book.available_quantity} dispo` : 'Indisponible'}
+                    </span>
+                </div>
+                <div class="book-body">
+                    <div class="book-cat">${escapeHtml(cat)}</div>
+                    <div class="book-title">${escapeHtml(book.title)}</div>
+                    <div class="book-author">par ${escapeHtml(book.author)}</div>
+                    <div class="book-isbn">${escapeHtml(book.isbn)}</div>
+                    ${isAvail
+                        ? `<button class="btn-borrow btn-borrow-active" onclick="showBorrowModal('${escapeHtml(book.title).replace(/'/g,"\\'")}')">
+                               <i class="fa-solid fa-bookmark"></i> Emprunter
+                           </button>`
+                        : `<button class="btn-borrow btn-borrow-disabled" disabled>
+                               <i class="fa-solid fa-lock"></i> Indisponible
+                           </button>`
+                    }
+                </div>`;
+            return div;
+        }
+
+        // ── Borrow Modal ───────────────────────────────
+        function showBorrowModal(title) {
+            document.getElementById('modal-book-hint').textContent = `📚 ${title}`;
+            document.getElementById('borrow-modal').style.display  = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('borrow-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on overlay click
+        document.getElementById('borrow-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // Close modal on Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ── Search ─────────────────────────────────────
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            render();
+        });
+
+        // ── Skeleton ───────────────────────────────────
+        function showSkeleton() {
+            const main = document.getElementById('catalog-main');
+            main.innerHTML = Array(8).fill(`
+                <div class="skeleton-card">
+                    <div class="skeleton skeleton-cover"></div>
+                    <div class="skeleton-body">
+                        <div class="skeleton skeleton-line" style="width:40%"></div>
+                        <div class="skeleton skeleton-line" style="width:90%"></div>
+                        <div class="skeleton skeleton-line" style="width:70%"></div>
+                        <div class="skeleton skeleton-line" style="width:50%;margin-top:10px;height:30px;border-radius:6px"></div>
+                    </div>
+                </div>`
+            ).join('');
+            // Wrap in a grid
+            const grid = document.createElement('div');
+            grid.className = 'books-grid';
+            grid.innerHTML = main.innerHTML;
+            main.innerHTML = '';
+            main.appendChild(grid);
+        }
+
+        // ── Error State ────────────────────────────────
+        function showError() {
+            document.getElementById('catalog-main').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon" style="color:#ef4444">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3>Catalogue temporairement indisponible</h3>
+                    <p>Impossible de charger les livres. Vérifiez votre connexion ou réessayez plus tard.</p>
+                    <button onclick="location.reload()" style="margin-top:20px;padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+                        <i class="fa-solid fa-rotate-right"></i> Réessayer
+                    </button>
+                </div>`;
+        }
+
+        // ── Bootstrap ──────────────────────────────────
+        (async function init() {
+            showSkeleton();
+            const books = await fetchBooks();
+            if (!books) {
+                showError();
+                return;
+            }
+            allBooks = books;
+            updateBadges(books);
+            render();
+        })();
+    </script>
+</body>
+</html>

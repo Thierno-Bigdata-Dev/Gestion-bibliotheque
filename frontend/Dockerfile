@@ -8,6 +8,7 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copier les fichiers statiques de l'application
 COPY index.html /usr/share/nginx/html/
+COPY catalogue.html /usr/share/nginx/html/
 COPY style.css /usr/share/nginx/html/
 COPY js/ /usr/share/nginx/html/js/
 EXPOSE 80
