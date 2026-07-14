@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 INSERT INTO users (first_name, last_name, email, role, password_hash, status)
 VALUES 
-('Admin', 'Super', 'admin@dit.sn', 'admin', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'ACTIF'),
+('Admin', 'Super', 'admin@dit.sn', 'Admin', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'ACTIF'),
 ('Alioune', 'Fall', 'alioune@dit.sn', 'Etudiant', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'ACTIF'),
 ('Bob', 'Ndiaye', 'bob@example.com', 'Enseignant', '$2b$12$UK19edHA.5OvUV8CUksU4OABFlH90wvsIaLqF3sIeBsbnIR24Jhum', 'EN_ATTENTE');
 
