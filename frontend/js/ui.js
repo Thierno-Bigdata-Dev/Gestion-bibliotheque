@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=16';
-import { Components } from './components.js?v=16';
-import { ApiService } from './api.js?v=16';
+import { appStore } from './store.js?v=17';
+import { Components } from './components.js?v=17';
+import { ApiService } from './api.js?v=17';
 
 export const UI = {
     init() {

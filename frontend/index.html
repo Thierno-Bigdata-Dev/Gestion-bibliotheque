@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Data Viz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
     <!-- Accessibility Live Region -->
@@ -167,6 +167,10 @@
                     <li class="menu-item public-only" data-tab="student-portal" data-title="Portail Étudiant" aria-label="Portail Étudiant" data-subtitle="Consultez le catalogue et gérez vos emprunts" aria-label="Consultez le catalogue et gérez vos emprunts" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
                         <span>Mon Espace</span>
+                    </li>
+                    <li class="menu-item mobile-logout" onclick="document.getElementById('btn-logout').click()" role="button" tabindex="0">
+                        <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" style="color: #ef4444;"></i>
+                        <span style="color: #ef4444;">Quitter</span>
                     </li>
                 </ul>
             </nav>
@@ -874,6 +878,6 @@
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
     
     <!-- JS App Logic -->
-    <script type="module" src="js/main.js?v=16"></script>
+    <script type="module" src="js/main.js?v=17"></script>
 </body>
 </html>
