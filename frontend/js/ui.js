@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=7';
-import { Components } from './components.js?v=7';
-import { ApiService } from './api.js?v=7';
+import { appStore } from './store.js?v=8';
+import { Components } from './components.js?v=8';
+import { ApiService } from './api.js?v=8';
 
 export const UI = {
     init() {
@@ -70,6 +70,7 @@ export const UI = {
         // Initial setup from persisted store
         const initialRole = appStore.getState('userRole');
         this.handleRoleChange(initialRole);
+        this.renderTab(appStore.getState('activeTab'));
     },
 
     cacheDOM() {
