@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=12';
-import { Components } from './components.js?v=12';
-import { ApiService } from './api.js?v=12';
+import { appStore } from './store.js?v=13';
+import { Components } from './components.js?v=13';
+import { ApiService } from './api.js?v=13';
 
 export const UI = {
     init() {
@@ -906,19 +906,19 @@ export const UI = {
             const dispoBadge = `<div style="position:absolute;top:12px;right:12px;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:0.5px;z-index:10;backdrop-filter:blur(4px);">✓ ${book.available_quantity} DISPO</div>`;
 
             const coverHtml = book.image_url
-                ? `<div style="position:relative;height:180px;"><img src="${Components.escapeHtml(book.image_url)}" alt="${Components.escapeHtml(book.title)}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;background:#1e293b;font-size:50px;color:#475569\\'><i class=\\'fa-solid fa-book\\'></i></div>'"></div>`
-                : `<div style="position:relative;height:180px;display:flex;align-items:center;justify-content:center;background:#1e293b;font-size:50px;color:#475569;"><i class="fa-solid fa-book"></i></div>`;
+                ? `<div style="position:relative;height:130px;"><img src="${Components.escapeHtml(book.image_url)}" alt="${Components.escapeHtml(book.title)}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;background:#1e293b;font-size:40px;color:#475569\\'><i class=\\'fa-solid fa-book\\'></i></div>'"></div>`
+                : `<div style="position:relative;height:130px;display:flex;align-items:center;justify-content:center;background:#1e293b;font-size:40px;color:#475569;"><i class="fa-solid fa-book"></i></div>`;
 
             card.innerHTML = `
                 ${dispoBadge}
                 ${coverHtml}
-                <div style="padding:16px;flex:1;display:flex;flex-direction:column;gap:6px;">
-                    <div style="font-size:11px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
-                    <div style="font-weight:700;font-size:15px;color:#f8fafc;line-height:1.35;margin-bottom:4px;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
-                    <div style="font-size:12px;color:#94a3b8;">par ${Components.escapeHtml(book.author)}</div>
-                    <div style="font-size:11px;color:#475569;font-family:monospace;">${Components.escapeHtml(book.isbn || 'N/A')}</div>
-                    <div style="margin-top:auto;padding-top:16px;">
-                        <button onclick="window.App.borrowBook(${book.id})" style="width:100%;background:#8b5cf6;color:white;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='#8b5cf6'">
+                <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div style="font-size:10px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
+                    <div style="font-weight:700;font-size:14px;color:#f8fafc;line-height:1.3;margin-bottom:2px;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
+                    <div style="font-size:11px;color:#94a3b8;">par ${Components.escapeHtml(book.author)}</div>
+                    <div style="font-size:10px;color:#475569;font-family:monospace;">${Components.escapeHtml(book.isbn || 'N/A')}</div>
+                    <div style="margin-top:auto;padding-top:12px;">
+                        <button onclick="window.App.borrowBook(${book.id})" style="width:100%;background:#8b5cf6;color:white;border:none;padding:8px;border-radius:6px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='#8b5cf6'">
                             <i class="fa-solid fa-bookmark"></i> Emprunter
                         </button>
                     </div>
