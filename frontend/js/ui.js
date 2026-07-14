@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=9';
-import { Components } from './components.js?v=9';
-import { ApiService } from './api.js?v=9';
+import { appStore } from './store.js?v=10';
+import { Components } from './components.js?v=10';
+import { ApiService } from './api.js?v=10';
 
 export const UI = {
     init() {
@@ -913,7 +913,7 @@ export const UI = {
                     <div style="font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
                     <div style="font-weight:700;font-size:13px;line-height:1.35;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
                     <div style="font-size:11px;color:var(--text-secondary);">par ${Components.escapeHtml(book.author)}</div>
-                    <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;">
+                    <div style="margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;">
                         <span style="font-size:11px;color:#10b981;font-weight:600;"><i class="fa-solid fa-circle-check"></i> ${book.available_quantity} dispo.</span>
                         <button class="btn btn-primary btn-sm" onclick="window.App.borrowBook(${book.id})" style="padding: 4px 10px; font-size: 11px;">
                             <i class="fa-solid fa-hand-holding-hand"></i> Emprunter
