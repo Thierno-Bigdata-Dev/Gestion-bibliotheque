@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=11';
-import { Components } from './components.js?v=11';
-import { ApiService } from './api.js?v=11';
+import { appStore } from './store.js?v=12';
+import { Components } from './components.js?v=12';
+import { ApiService } from './api.js?v=12';
 
 export const UI = {
     init() {
@@ -901,30 +901,33 @@ export const UI = {
 
         available.forEach(book => {
             const card = document.createElement('div');
-            card.style.cssText = 'background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:all 0.2s ease;cursor:default;';
+            card.style.cssText = 'background:var(--bg-secondary);border:1px solid #1e293b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:all 0.2s ease;cursor:default;position:relative;';
+
+            const dispoBadge = `<div style="position:absolute;top:12px;right:12px;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.3);padding:4px 10px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:0.5px;z-index:10;backdrop-filter:blur(4px);">✓ ${book.available_quantity} DISPO</div>`;
 
             const coverHtml = book.image_url
-                ? `<img src="${Components.escapeHtml(book.image_url)}" alt="${Components.escapeHtml(book.title)}" style="width:100%;height:150px;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML='<div style=height:150px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:40px;color:var(--text-muted)><i class=fa-solid fa-book></i></div>'">`
-                : `<div style="height:150px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:40px;color:var(--text-muted);"><i class="fa-solid fa-book"></i></div>`;
+                ? `<div style="position:relative;height:180px;"><img src="${Components.escapeHtml(book.image_url)}" alt="${Components.escapeHtml(book.title)}" style="width:100%;height:100%;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML='<div style=\\'height:100%;display:flex;align-items:center;justify-content:center;background:#1e293b;font-size:50px;color:#475569\\'><i class=\\'fa-solid fa-book\\'></i></div>'"></div>`
+                : `<div style="position:relative;height:180px;display:flex;align-items:center;justify-content:center;background:#1e293b;font-size:50px;color:#475569;"><i class="fa-solid fa-book"></i></div>`;
 
             card.innerHTML = `
+                ${dispoBadge}
                 ${coverHtml}
-                <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">
-                    <div style="font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
-                    <div style="font-weight:700;font-size:13px;line-height:1.35;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
-                    <div style="font-size:11px;color:var(--text-secondary);">par ${Components.escapeHtml(book.author)}</div>
-                    <div style="margin-top:auto;padding-top:8px;display:flex;align-items:flex-end;justify-content:space-between;gap:4px;">
-                        <span style="font-size:11px;color:#10b981;font-weight:600;white-space:nowrap;margin-bottom:4px;"><i class="fa-solid fa-circle-check"></i> ${book.available_quantity} dispo.</span>
-                        <button class="btn btn-primary btn-sm" onclick="window.App.borrowBook(${book.id})" style="padding: 4px 10px; font-size: 11px; white-space:nowrap; flex-shrink:0;">
-                            <i class="fa-solid fa-hand-holding-hand"></i> Emprunter
+                <div style="padding:16px;flex:1;display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-size:11px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
+                    <div style="font-weight:700;font-size:15px;color:#f8fafc;line-height:1.35;margin-bottom:4px;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
+                    <div style="font-size:12px;color:#94a3b8;">par ${Components.escapeHtml(book.author)}</div>
+                    <div style="font-size:11px;color:#475569;font-family:monospace;">${Components.escapeHtml(book.isbn || 'N/A')}</div>
+                    <div style="margin-top:auto;padding-top:16px;">
+                        <button onclick="window.App.borrowBook(${book.id})" style="width:100%;background:#8b5cf6;color:white;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='#8b5cf6'">
+                            <i class="fa-solid fa-bookmark"></i> Emprunter
                         </button>
                     </div>
                 </div>
             `;
 
             // Hover effect
-            card.addEventListener('mouseenter', () => { card.style.borderColor = '#6366f1'; card.style.transform = 'translateY(-3px)'; card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'; });
-            card.addEventListener('mouseleave', () => { card.style.borderColor = ''; card.style.transform = ''; card.style.boxShadow = ''; });
+            card.addEventListener('mouseenter', () => { card.style.borderColor = '#8b5cf6'; card.style.transform = 'translateY(-3px)'; card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'; });
+            card.addEventListener('mouseleave', () => { card.style.borderColor = '#1e293b'; card.style.transform = ''; card.style.boxShadow = ''; });
 
             grid.appendChild(card);
         });
