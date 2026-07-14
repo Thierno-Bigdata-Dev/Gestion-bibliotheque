@@ -133,8 +133,24 @@ export const UI = {
         const activeNav = document.querySelector(`.menu-item[data-tab="${tabId}"]`);
         const activeContent = document.getElementById(`tab-${tabId}`);
         
-        if (activeNav) activeNav.classList.add('active');
-        if (activeContent) activeContent.classList.add('active');
+        if (activeNav) {
+            activeNav.classList.add('active');
+            
+            // Update page header text
+            const titleEl = document.getElementById('page-title');
+            const subTitleEl = document.getElementById('page-subtitle');
+            
+            if (titleEl && activeNav.dataset.title) {
+                titleEl.textContent = activeNav.dataset.title;
+            }
+            if (subTitleEl && activeNav.dataset.subtitle) {
+                subTitleEl.textContent = activeNav.dataset.subtitle;
+            }
+        }
+        
+        if (activeContent) {
+            activeContent.classList.add('active');
+        }
     },
 
     updateConnectionStatus(isOffline) {
