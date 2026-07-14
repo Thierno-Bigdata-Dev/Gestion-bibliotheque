@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=13';
-import { Components } from './components.js?v=13';
-import { ApiService } from './api.js?v=13';
+import { appStore } from './store.js?v=14';
+import { Components } from './components.js?v=14';
+import { ApiService } from './api.js?v=14';
 
 export const UI = {
     init() {
@@ -302,7 +302,7 @@ export const UI = {
                 let actions = '';
                 if (loan.status === 'active') {
                     actions += `
-                        <button class="btn-icon btn-icon-success" onclick="window.App.returnBook(${loan.id})" title="Restituer">
+                        <button class="btn-icon btn-icon-success" onclick="window.App.returnLoan(${loan.id})" title="Restituer">
                             <i class="fa-solid fa-check"></i>
                         </button>
                         <button class="btn-icon btn-icon-info" onclick="window.App.renewLoan(${loan.id})" title="Renouveler (+15j)">
@@ -337,15 +337,27 @@ export const UI = {
                 let badgeText = 'En cours';
                 if (loan.status === 'returned') {
                     badgeClass = 'badge-success'; badgeText = 'Retourné';
+                } else if (loan.status === 'pending') {
+                    badgeClass = 'badge-warning'; badgeText = 'En attente';
                 } else if (new Date() > new Date(loan.due_at)) {
                     badgeClass = 'badge-danger'; badgeText = 'En retard';
                     tr.classList.add('row-overdue');
                 }
+
+                let actions = '';
+                if (loan.status === 'active') {
+                    actions += `<button class="btn-icon btn-icon-success" onclick="window.App.returnLoan(${loan.id})" title="Restituer"><i class="fa-solid fa-check"></i></button>`;
+                } else if (loan.status === 'pending') {
+                    actions += `<button class="btn-icon btn-icon-success" onclick="window.App.approveLoan(${loan.id})" title="Approuver"><i class="fa-solid fa-check"></i></button>
+                                <button class="btn-icon btn-icon-danger" onclick="window.App.rejectLoan(${loan.id})" title="Rejeter"><i class="fa-solid fa-xmark"></i></button>`;
+                }
+
                 tr.innerHTML = `
                     <td><strong>${Components.escapeHtml(bookTitle)}</strong></td>
                     <td>${Components.escapeHtml(userName)}</td>
                     <td>${loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleDateString('fr-FR') : '-'}</td>
                     <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+                    <td><div style="display:flex;gap:4px;">${actions}</div></td>
                 `;
                 this.dom.recentLoansList.appendChild(tr);
             });
