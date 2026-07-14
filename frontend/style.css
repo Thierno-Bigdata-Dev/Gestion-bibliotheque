@@ -37,7 +37,7 @@
     --border-radius-md: 12px;
     --border-radius-lg: 16px;
     
-    --sidebar-width: 260px;
+    --sidebar-width: 210px;
 }
 
 * {
@@ -160,8 +160,9 @@ body {
 }
 
 .sidebar-footer {
-    padding: 20px;
+    padding: 16px;
     border-top: 1px solid var(--border-color);
+    margin-top: 0;
 }
 
 .user-badge {
@@ -2029,49 +2030,48 @@ input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus,
     outline-offset: 3px;
 }
 
- 
- / *   A c c e s s i b i l i t y   &   E d g e   C a s e s   U t i l s   * / 
- . t e x t - t r u n c a t e   { 
-         w h i t e - s p a c e :   n o w r a p ; 
-         o v e r f l o w :   h i d d e n ; 
-         t e x t - o v e r f l o w :   e l l i p s i s ; 
-         m a x - w i d t h :   2 5 0 p x ; 
-         d i s p l a y :   i n l i n e - b l o c k ; 
-         v e r t i c a l - a l i g n :   m i d d l e ; 
- } 
- . t a b l e - r e s p o n s i v e   { 
-         o v e r f l o w - x :   a u t o ; 
-         - w e b k i t - o v e r f l o w - s c r o l l i n g :   t o u c h ; 
-         w i d t h :   1 0 0 % ; 
- } 
- @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   { 
-         . m o d a l - c o n t e n t   { 
-                 m a x - w i d t h :   9 5 v w   ! i m p o r t a n t ; 
-                 p a d d i n g :   1 6 p x ; 
-         } 
-         . t e x t - t r u n c a t e   { 
-                 m a x - w i d t h :   1 5 0 p x ; 
-         } 
- } 
- 
- 
- 
- . t a b l e - c o n t a i n e r   { 
-         o v e r f l o w - x :   a u t o ; 
-         - w e b k i t - o v e r f l o w - s c r o l l i n g :   t o u c h ; 
-         w i d t h :   1 0 0 % ; 
- } 
- 
- 
- 
 
- . m o b i l e - l o g o u t   { 
-         d i s p l a y :   n o n e ; 
- } 
- @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   { 
-         . m o b i l e - l o g o u t   { 
-                 d i s p l a y :   f l e x ; 
-         } 
- } 
-  
- 
+/* Accessibility & Edge Cases Utils */
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+@media (max-width: 768px) {
+    .modal-content {
+        max-width: 95vw !important;
+        padding: 16px;
+    }
+    .text-truncate {
+        max-width: 150px;
+    }
+}
+
+
+
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
+
+
+
+.mobile-logout {
+    display: none;
+}
+@media (max-width: 768px) {
+    .mobile-logout {
+        display: flex;
+    }
+}
+
