@@ -16,7 +16,12 @@ export const UI = {
         // Listen to store changes
         appStore.subscribe('isOffline', isOffline => this.updateConnectionStatus(isOffline));
         appStore.subscribe('activeTab', tabId => this.renderTab(tabId));
-        appStore.subscribe('books', books => this.renderBooks(books));
+        appStore.subscribe('books', books => {
+            this.renderBooks(books);
+            if (appStore.getState('userRole') === 'public') {
+                this.renderCatalog(books);
+            }
+        });
         appStore.subscribe('users', users => {
             this.renderUsers(users);
             if (appStore.getState('userRole') === 'public') {
@@ -31,7 +36,10 @@ export const UI = {
                 this.renderStudentProfile(activeStuId);
             }
         });
-        appStore.subscribe('userRole', role => this.handleRoleChange(role));
+        appStore.subscribe('userRole', role => {
+            this.handleRoleChange(role);
+            if (role === 'public') this.renderCatalog(appStore.getState('books'));
+        });
         appStore.subscribe('activeStudentId', studentId => this.renderStudentProfile(studentId));
         appStore.subscribe('allUsers', users => this.renderPendingTab(users));
         appStore.subscribe('isLoading', isLoading => {
@@ -39,12 +47,14 @@ export const UI = {
             if (isLoading) {
                 if (announcer) announcer.textContent = 'Chargement des données en cours...';
                 this.renderBooks([]);
+                this.renderCatalog([]);
                 this.renderUsers([]);
                 this.renderLoans([]);
                 this.renderPendingTab([]);
             } else {
                 if (announcer) announcer.textContent = 'Chargement terminé.';
                 this.renderBooks(appStore.getState('books'));
+                if (appStore.getState('userRole') === 'public') this.renderCatalog(appStore.getState('books'));
                 this.renderUsers(appStore.getState('users'));
                 this.renderLoans(appStore.getState('loans'));
                 this.renderPendingTab(appStore.getState('allUsers'));
@@ -176,6 +186,36 @@ export const UI = {
             }
             this.dom.booksList.appendChild(Components.createBookRow(book, actions));
         });
+    },
+
+    renderCatalog(books) {
+        const container = document.getElementById('catalog-container');
+        if (!container) return;
+
+        if (appStore.getState('isLoading')) {
+            container.innerHTML = '<div style="text-align:center; padding: 40px;"><i class="fa-solid fa-circle-notch fa-spin fa-3x" style="color:var(--primary)"></i><p>Chargement du catalogue...</p></div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        if (books.length === 0) {
+            container.innerHTML = Components.getEmptyStateHTML(
+                "Catalogue vide",
+                "Aucun livre n'est disponible pour le moment.",
+                "fa-book-open"
+            );
+            return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'catalog-grid';
+
+        books.forEach(book => {
+            const card = Components.createBookCard(book);
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
     },
 
     renderUsers(users) {
@@ -610,9 +650,9 @@ export const UI = {
             document.body.classList.add(`mode-${role}`);
             
             const currentTab = appStore.getState('activeTab');
-            if (role === 'public' && (currentTab === 'dashboard' || currentTab === 'users' || currentTab === 'loans')) {
-                appStore.setState('activeTab', 'books');
-            } else if (role === 'admin' && currentTab === 'student-portal') {
+            if (role === 'public' && (currentTab === 'dashboard' || currentTab === 'users' || currentTab === 'loans' || currentTab === 'books')) {
+                appStore.setState('activeTab', 'catalog');
+            } else if (role === 'admin' && (currentTab === 'student-portal' || currentTab === 'catalog')) {
                 appStore.setState('activeTab', 'dashboard');
             }
             
@@ -709,6 +749,77 @@ export const UI = {
         };
         update();
         setInterval(update, 1000);
+    },
+
+    // -----------------------------------------------
+    // Public Catalog Rendering
+    // -----------------------------------------------
+    renderCatalog(books) {
+        const container = document.getElementById('catalog-container');
+        if (!container) return;
+
+        if (!books || books.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="text-align:center;padding:80px 20px;">
+                    <i class="fa-solid fa-book-open" style="font-size:4rem;color:var(--text-secondary);margin-bottom:16px;display:block;"></i>
+                    <h3 style="margin-bottom:8px;">Catalogue vide</h3>
+                    <p style="color:var(--text-secondary);">Aucun ouvrage disponible pour le moment.</p>
+                </div>`;
+            return;
+        }
+
+        // Group books by category
+        const categories = {};
+        const categoryOrder = ['Informatique & Big Data', 'Marketing Digital', 'Littérature', 'Autre'];
+
+        books.forEach(book => {
+            const cat = book.category || 'Autre';
+            if (!categories[cat]) categories[cat] = [];
+            categories[cat].push(book);
+        });
+
+        let html = '';
+        const sortedCats = [
+            ...categoryOrder.filter(c => categories[c]),
+            ...Object.keys(categories).filter(c => !categoryOrder.includes(c))
+        ];
+
+        sortedCats.forEach(cat => {
+            const booksInCat = categories[cat];
+            html += `
+                <div class="catalog-section">
+                    <div class="catalog-section-header">
+                        <h3 class="catalog-section-title">
+                            <span class="catalog-section-icon">${this._getCategoryIcon(cat)}</span>
+                            ${Components.escapeHtml(cat)}
+                            <span class="catalog-count">${booksInCat.length} ouvrage${booksInCat.length > 1 ? 's' : ''}</span>
+                        </h3>
+                    </div>
+                    <div class="catalog-grid" id="catalog-grid-${Components.escapeHtml(cat)}"></div>
+                </div>`;
+        });
+
+        container.innerHTML = html;
+
+        // Append book cards
+        sortedCats.forEach(cat => {
+            const booksInCat = categories[cat];
+            const grid = container.querySelector(`#catalog-grid-${CSS.escape(cat)}`);
+            if (grid) {
+                booksInCat.forEach(book => {
+                    grid.appendChild(Components.createBookCard(book));
+                });
+            }
+        });
+    },
+
+    _getCategoryIcon(category) {
+        const icons = {
+            'Informatique & Big Data': '<i class="fa-solid fa-laptop-code"></i>',
+            'Marketing Digital': '<i class="fa-solid fa-bullhorn"></i>',
+            'Littérature': '<i class="fa-solid fa-feather-pointed"></i>',
+        };
+        return icons[category] || '<i class="fa-solid fa-bookmark"></i>';
     }
 };
 

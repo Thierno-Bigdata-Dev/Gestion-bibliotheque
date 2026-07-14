@@ -12,14 +12,18 @@ CREATE TABLE IF NOT EXISTS books (
     isbn VARCHAR(50) UNIQUE NOT NULL,
     published_year INT,
     quantity INT DEFAULT 1 NOT NULL,
-    available_quantity INT DEFAULT 1 NOT NULL
+    available_quantity INT DEFAULT 1 NOT NULL,
+    category VARCHAR(100) DEFAULT 'Autre',
+    image_url TEXT DEFAULT ''
 );
 
-INSERT INTO books (title, author, isbn, published_year, quantity, available_quantity)
+INSERT INTO books (title, author, isbn, published_year, quantity, available_quantity, category, image_url)
 VALUES 
-('Les Misérables', 'Victor Hugo', '978-2070409228', 1862, 5, 4),
-('L''Étranger', 'Albert Camus', '978-2070360024', 1942, 3, 3),
-('Le Petit Prince', 'Antoine de Saint-Exupéry', '978-2070612758', 1943, 2, 1);
+('Les Misérables', 'Victor Hugo', '978-2070409228', 1862, 5, 4, 'Littérature', ''),
+('L''Étranger', 'Albert Camus', '978-2070360024', 1942, 3, 3, 'Littérature', ''),
+('Le Petit Prince', 'Antoine de Saint-Exupéry', '978-2070612758', 1943, 2, 1, 'Littérature', ''),
+('Python pour la Data Science', 'Wes McKinney', '978-1491957660', 2017, 4, 4, 'Informatique & Big Data', ''),
+('Marketing à l''ère numérique', 'Marie Mercanti', '978-2100788872', 2019, 3, 3, 'Marketing Digital', '');
 
 
 \connect dit_users;
