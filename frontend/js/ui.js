@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=8';
-import { Components } from './components.js?v=8';
-import { ApiService } from './api.js?v=8';
+import { appStore } from './store.js?v=9';
+import { Components } from './components.js?v=9';
+import { ApiService } from './api.js?v=9';
 
 export const UI = {
     init() {
@@ -307,6 +307,15 @@ export const UI = {
                         </button>
                         <button class="btn-icon btn-icon-info" onclick="window.App.renewLoan(${loan.id})" title="Renouveler (+15j)">
                             <i class="fa-solid fa-calendar-plus"></i>
+                        </button>
+                    `;
+                } else if (loan.status === 'pending') {
+                    actions += `
+                        <button class="btn-icon btn-icon-success" onclick="window.App.approveLoan(${loan.id})" title="Approuver l'emprunt">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                        <button class="btn-icon btn-icon-danger" onclick="window.App.rejectLoan(${loan.id})" title="Rejeter la demande">
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                     `;
                 }
@@ -848,8 +857,10 @@ export const UI = {
             const isOverdue = loan.status !== 'returned' && new Date(loan.due_at) < now;
             let badgeCls = 'badge', badgeTxt = 'En cours';
             if (loan.status === 'returned') { badgeCls += ' badge-success'; badgeTxt = 'Retourné'; }
+            else if (loan.status === 'pending') { badgeCls += ' badge-warning'; badgeTxt = '⏳ En attente'; }
+            else if (loan.status === 'rejected') { badgeCls += ' badge-danger'; badgeTxt = '✖ Rejeté'; }
             else if (isOverdue)             { badgeCls += ' badge-danger';  badgeTxt = '⚠️ En retard'; }
-            else                            { badgeCls += ' badge-warning'; }
+            else                            { badgeCls += ' badge-info'; badgeTxt = 'En cours'; }
 
             const tr = document.createElement('tr');
             if (isOverdue) tr.style.background = 'rgba(239,68,68,0.05)';
@@ -904,6 +915,9 @@ export const UI = {
                     <div style="font-size:11px;color:var(--text-secondary);">par ${Components.escapeHtml(book.author)}</div>
                     <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;">
                         <span style="font-size:11px;color:#10b981;font-weight:600;"><i class="fa-solid fa-circle-check"></i> ${book.available_quantity} dispo.</span>
+                        <button class="btn btn-primary btn-sm" onclick="window.App.borrowBook(${book.id})" style="padding: 4px 10px; font-size: 11px;">
+                            <i class="fa-solid fa-hand-holding-hand"></i> Emprunter
+                        </button>
                     </div>
                 </div>
             `;

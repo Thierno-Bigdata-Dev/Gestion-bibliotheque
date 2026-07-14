@@ -108,11 +108,17 @@ export const Components = {
         const bookTitle = loan.book ? loan.book.title : `Livre #${loan.book_id}`;
         const userName = loan.user ? `${loan.user.first_name} ${loan.user.last_name}` : `Utilisateur #${loan.user_id}`;
         
-        let badgeClass = 'badge-warning';
+        let badgeClass = 'badge-info';
         let badgeText = 'En cours';
         if (loan.status === 'returned') {
             badgeClass = 'badge-success';
             badgeText = 'Retourné';
+        } else if (loan.status === 'pending') {
+            badgeClass = 'badge-warning';
+            badgeText = '⏳ En attente';
+        } else if (loan.status === 'rejected') {
+            badgeClass = 'badge-danger';
+            badgeText = '✖ Rejeté';
         } else if (new Date() > new Date(loan.due_at)) {
             badgeClass = 'badge-danger';
             badgeText = 'En retard';

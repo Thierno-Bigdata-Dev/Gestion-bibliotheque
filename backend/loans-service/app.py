@@ -103,6 +103,8 @@ def create_loan():
         user_resp = requests.get(f"{USERS_SERVICE_URL}/users/{user_id}", timeout=2)
         if user_resp.status_code != 200:
             return jsonify({'error': f"User with ID {user_id} not found"}), 404
+        user_data = user_resp.json()
+        user_role = user_data.get('role', '')
     except requests.exceptions.RequestException:
         return jsonify({'error': 'Users service is currently unavailable'}), 503
         
@@ -130,18 +132,48 @@ def create_loan():
     borrow_date = datetime.datetime.utcnow()
     due_date = borrow_date + datetime.timedelta(days=15) # Durée standard d'emprunt : 15 jours
     
+    initial_status = 'active' if user_role == 'Admin' else 'pending'
+    
     loan = Loan(
         user_id=user_id,
         book_id=book_id,
         borrowed_at=borrow_date,
         due_at=due_date,
-        status='active'
+        status=initial_status
     )
     
     db.session.add(loan)
     db.session.commit()
     
     return jsonify(enrich_loan_data(loan)), 201
+
+@app.route('/loans/<int:loan_id>/approve', methods=['POST'])
+def approve_loan(loan_id):
+    loan = Loan.query.get_or_404(loan_id)
+    if loan.status != 'pending':
+        return jsonify({'error': 'Only pending loans can be approved'}), 400
+    
+    loan.status = 'active'
+    db.session.commit()
+    return jsonify(enrich_loan_data(loan)), 200
+
+@app.route('/loans/<int:loan_id>/reject', methods=['POST'])
+def reject_loan(loan_id):
+    loan = Loan.query.get_or_404(loan_id)
+    if loan.status != 'pending':
+        return jsonify({'error': 'Only pending loans can be rejected'}), 400
+        
+    try:
+        # Restituer la quantité disponible du livre
+        return_resp = requests.post(f"{BOOKS_SERVICE_URL}/books/{loan.book_id}/return", timeout=2)
+        if return_resp.status_code != 200:
+            print(f"Warning: Failed to restock book {loan.book_id} upon rejection")
+    except requests.exceptions.RequestException:
+        print(f"Warning: Books service unavailable for restock book {loan.book_id} upon rejection")
+        
+    loan.status = 'rejected'
+    db.session.commit()
+    return jsonify(enrich_loan_data(loan)), 200
 
 @app.route('/loans/<int:loan_id>/return', methods=['POST'])
 def return_loan(loan_id):

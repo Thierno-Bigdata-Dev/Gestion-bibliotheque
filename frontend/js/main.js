@@ -3,11 +3,11 @@
  * Bootstraps the application, links UI and API, and exposes global methods for inline HTML events.
  */
 
-import { ApiService } from './api.js?v=8';
-import { appStore } from './store.js?v=8';
-import { UI } from './ui.js?v=8';
-import { Components } from './components.js?v=8';
-import { AuthUI } from './auth.js?v=8';
+import { ApiService } from './api.js?v=9';
+import { appStore } from './store.js?v=9';
+import { UI } from './ui.js?v=9';
+import { Components } from './components.js?v=9';
+import { AuthUI } from './auth.js?v=9';
 
 class App {
     async init() {
@@ -185,24 +185,58 @@ class App {
     }
 
     async returnBook(id) {
-        if (!await UI.customConfirm("Confirmer la restitution ?")) return;
+        if (!await UI.customConfirm("Confirmer la restitution de ce livre ?")) return;
         try {
             await ApiService.returnLoan(id);
             Components.showToast("Livre restitué avec succès.", "success");
             this.loadAllData();
-        } catch (e) {
-            Components.showToast("Erreur lors de la restitution.", "danger");
+        } catch (err) {
+            Components.showToast(err.message, "danger");
         }
     }
 
     async renewLoan(id) {
-        if (!await UI.customConfirm("Voulez-vous renouveler cet emprunt (+15 jours) ?")) return;
+        if (!await UI.customConfirm("Prolonger cet emprunt de 15 jours supplémentaires ?")) return;
         try {
             await ApiService.renewLoan(id);
-            Components.showToast("Emprunt renouvelé avec succès.", "success");
+            Components.showToast("Emprunt prolongé.", "success");
             this.loadAllData();
-        } catch (e) {
-            Components.showToast("Erreur lors du renouvellement.", "danger");
+        } catch (err) {
+            Components.showToast(err.message, "danger");
+        }
+    }
+
+    async borrowBook(bookId) {
+        if (!await UI.customConfirm("Voulez-vous envoyer une demande d'emprunt pour ce livre ?")) return;
+        try {
+            const user = appStore.getState('currentUser');
+            await ApiService.createLoan({ user_id: user.id, book_id: bookId });
+            Components.showToast("Demande d'emprunt envoyée ! En attente de validation.", "success");
+            this.loadAllData();
+        } catch (err) {
+            Components.showToast(err.message, "danger");
+        }
+    }
+
+    async approveLoan(id) {
+        if (!await UI.customConfirm("Approuver cet emprunt ?")) return;
+        try {
+            await ApiService.approveLoan(id);
+            Components.showToast("Emprunt validé avec succès.", "success");
+            this.loadAllData();
+        } catch (err) {
+            Components.showToast(err.message, "danger");
+        }
+    }
+
+    async rejectLoan(id) {
+        if (!await UI.customConfirm("Rejeter cette demande d'emprunt ? Le livre redeviendra disponible.")) return;
+        try {
+            await ApiService.rejectLoan(id);
+            Components.showToast("Demande d'emprunt rejetée.", "success");
+            this.loadAllData();
+        } catch (err) {
+            Components.showToast(err.message, "danger");
         }
     }
 

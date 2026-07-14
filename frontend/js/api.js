@@ -148,6 +148,12 @@ export const ApiService = {
     async createLoan(data) {
         return this.request(API_URLS.loans, { method: 'POST', body: JSON.stringify(data) });
     },
+    async approveLoan(id) {
+        return this.request(`${API_URLS.loans}/${id}/approve`, { method: 'POST' });
+    },
+    async rejectLoan(id) {
+        return this.request(`${API_URLS.loans}/${id}/reject`, { method: 'POST' });
+    },
     async returnLoan(id) {
         return this.request(`${API_URLS.loans}/${id}/return`, { method: 'POST' });
     },
