@@ -4,9 +4,9 @@
  * Exposes global `authUI` object used by inline HTML events.
  */
 
-import { ApiService } from './api.js?v=8';
-import { appStore } from './store.js?v=8';
-import { Components } from './components.js?v=8';
+import { ApiService } from './api.js?v=9';
+import { appStore } from './store.js?v=9';
+import { Components } from './components.js?v=9';
 
 export const AuthUI = {
     // ─────────────────────────────────────────────
