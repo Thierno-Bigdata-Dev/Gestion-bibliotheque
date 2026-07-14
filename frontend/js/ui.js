@@ -19,26 +19,24 @@ export const UI = {
         appStore.subscribe('books', books => {
             this.renderBooks(books);
             if (appStore.getState('userRole') === 'public') {
-                this.renderCatalog(books);
+                this.renderAvailableBooks(books);
             }
         });
         appStore.subscribe('users', users => {
             this.renderUsers(users);
-            if (appStore.getState('userRole') === 'public') {
-                this.populateStudentDropdown(users);
-            }
         });
         appStore.subscribe('loans', loans => {
             this.renderLoans(loans);
             this.renderDashboardStats();
-            const activeStuId = appStore.getState('activeStudentId');
-            if (activeStuId) {
-                this.renderStudentProfile(activeStuId);
+            if (appStore.getState('userRole') === 'public') {
+                this.renderMyLoans(loans);
             }
         });
         appStore.subscribe('userRole', role => {
             this.handleRoleChange(role);
-            if (role === 'public') this.renderCatalog(appStore.getState('books'));
+            if (role === 'public') {
+                this.renderStudentPortal();
+            }
         });
         appStore.subscribe('activeStudentId', studentId => this.renderStudentProfile(studentId));
         appStore.subscribe('allUsers', users => this.renderPendingTab(users));
@@ -47,17 +45,18 @@ export const UI = {
             if (isLoading) {
                 if (announcer) announcer.textContent = 'Chargement des données en cours...';
                 this.renderBooks([]);
-                this.renderCatalog([]);
                 this.renderUsers([]);
                 this.renderLoans([]);
                 this.renderPendingTab([]);
             } else {
                 if (announcer) announcer.textContent = 'Chargement terminé.';
                 this.renderBooks(appStore.getState('books'));
-                if (appStore.getState('userRole') === 'public') this.renderCatalog(appStore.getState('books'));
                 this.renderUsers(appStore.getState('users'));
                 this.renderLoans(appStore.getState('loans'));
                 this.renderPendingTab(appStore.getState('allUsers'));
+                if (appStore.getState('userRole') === 'public') {
+                    this.renderStudentPortal();
+                }
             }
         });
 
@@ -752,64 +751,163 @@ export const UI = {
     },
 
     // -----------------------------------------------
-    // Public Catalog Rendering
+    // Student / Teacher Portal
     // -----------------------------------------------
-    renderCatalog(books) {
-        const container = document.getElementById('catalog-container');
-        if (!container) return;
+    renderStudentPortal() {
+        const user  = appStore.getState('currentUser');
+        const loans = appStore.getState('loans') || [];
+        const books = appStore.getState('books') || [];
 
-        if (!books || books.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state" style="text-align:center;padding:80px 20px;">
-                    <i class="fa-solid fa-book-open" style="font-size:4rem;color:var(--text-secondary);margin-bottom:16px;display:block;"></i>
-                    <h3 style="margin-bottom:8px;">Catalogue vide</h3>
-                    <p style="color:var(--text-secondary);">Aucun ouvrage disponible pour le moment.</p>
-                </div>`;
+        // Update welcome banner
+        if (user) {
+            const titleEl = document.getElementById('portal-welcome-title');
+            const subEl   = document.getElementById('portal-welcome-sub');
+            if (titleEl) titleEl.textContent = `Bonjour, ${user.first_name} 👋`;
+            if (subEl)   subEl.textContent   = `${user.role} — ${user.email}`;
+        }
+
+        // My loans (filter by current user id)
+        const myLoans = user
+            ? loans.filter(l => l.user_id === user.id || l.user?.id === user.id)
+            : [];
+
+        this._myLoansAll = myLoans;
+        this._myLoansFilter = this._myLoansFilter || 'all';
+        this.renderMyLoans(myLoans);
+
+        // Available books
+        this.renderAvailableBooks(books);
+
+        // Bind search on available books
+        const searchEl = document.getElementById('search-available-books');
+        if (searchEl && !searchEl._bound) {
+            searchEl._bound = true;
+            searchEl.addEventListener('input', () => {
+                this.renderAvailableBooks(appStore.getState('books'), searchEl.value);
+            });
+        }
+    },
+
+    renderMyLoans(loans, filter) {
+        filter = filter || this._myLoansFilter || 'all';
+        this._myLoansFilter = filter;
+
+        const tbody = document.getElementById('my-loans-list');
+        if (!tbody) return;
+
+        const now = new Date();
+        const myLoans = loans || this._myLoansAll || [];
+
+        // Update stats
+        const active   = myLoans.filter(l => l.status !== 'returned' && new Date(l.due_at) >= now).length;
+        const overdue  = myLoans.filter(l => l.status !== 'returned' && new Date(l.due_at) < now).length;
+        const returned = myLoans.filter(l => l.status === 'returned').length;
+
+        const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+        setEl('portal-stat-active',   active);
+        setEl('portal-stat-overdue',  overdue);
+        setEl('portal-stat-returned', returned);
+        setEl('my-loans-count',       myLoans.length);
+
+        // Highlight active filter button
+        document.querySelectorAll('#loans-filter-chips [data-lfilter]').forEach(btn => {
+            btn.className = btn.dataset.lfilter === filter
+                ? 'btn btn-primary btn-sm'
+                : 'btn btn-secondary btn-sm';
+        });
+
+        // Apply filter
+        let filtered = myLoans;
+        if (filter === 'active')   filtered = myLoans.filter(l => l.status !== 'returned' && new Date(l.due_at) >= now);
+        if (filter === 'overdue')  filtered = myLoans.filter(l => l.status !== 'returned' && new Date(l.due_at) < now);
+        if (filter === 'returned') filtered = myLoans.filter(l => l.status === 'returned');
+
+        tbody.innerHTML = '';
+        if (filtered.length === 0) {
+            const msgs = {
+                all:      'Vous n\'avez aucun emprunt enregistré.',
+                active:   'Aucun emprunt en cours.',
+                overdue:  'Aucun emprunt en retard. 🎉',
+                returned: 'Aucun livre retourné.',
+            };
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:48px;color:var(--text-secondary);">
+                <i class="fa-solid fa-handshake" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px;"></i>
+                ${msgs[filter] || msgs.all}</td></tr>`;
             return;
         }
 
-        // Group books by category
-        const categories = {};
-        const categoryOrder = ['Informatique & Big Data', 'Marketing Digital', 'Littérature', 'Autre'];
+        const fmt = d => d ? new Date(d).toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' }) : '—';
 
-        books.forEach(book => {
-            const cat = book.category || 'Autre';
-            if (!categories[cat]) categories[cat] = [];
-            categories[cat].push(book);
+        filtered.forEach(loan => {
+            const bookTitle = loan.book?.title || `Livre #${loan.book_id}`;
+            const isOverdue = loan.status !== 'returned' && new Date(loan.due_at) < now;
+            let badgeCls = 'badge', badgeTxt = 'En cours';
+            if (loan.status === 'returned') { badgeCls += ' badge-success'; badgeTxt = 'Retourné'; }
+            else if (isOverdue)             { badgeCls += ' badge-danger';  badgeTxt = '⚠️ En retard'; }
+            else                            { badgeCls += ' badge-warning'; }
+
+            const tr = document.createElement('tr');
+            if (isOverdue) tr.style.background = 'rgba(239,68,68,0.05)';
+            tr.innerHTML = `
+                <td><strong>${Components.escapeHtml(bookTitle)}</strong></td>
+                <td style="font-size:13px;color:var(--text-secondary);">${fmt(loan.borrowed_at)}</td>
+                <td style="font-size:13px;color:var(--text-secondary);">${fmt(loan.due_at)}</td>
+                <td style="font-size:13px;color:var(--text-secondary);">${fmt(loan.returned_at)}</td>
+                <td><span class="${badgeCls}">${badgeTxt}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    },
+
+    renderAvailableBooks(books, searchQuery = '') {
+        const grid = document.getElementById('available-books-grid');
+        if (!grid) return;
+
+        const q = searchQuery.toLowerCase();
+        const available = (books || []).filter(b => {
+            const matchSearch = !q ||
+                b.title?.toLowerCase().includes(q) ||
+                b.author?.toLowerCase().includes(q);
+            return b.available_quantity > 0 && matchSearch;
         });
 
-        let html = '';
-        const sortedCats = [
-            ...categoryOrder.filter(c => categories[c]),
-            ...Object.keys(categories).filter(c => !categoryOrder.includes(c))
-        ];
+        const countEl = document.getElementById('available-books-count');
+        if (countEl) countEl.textContent = available.length;
 
-        sortedCats.forEach(cat => {
-            const booksInCat = categories[cat];
-            html += `
-                <div class="catalog-section">
-                    <div class="catalog-section-header">
-                        <h3 class="catalog-section-title">
-                            <span class="catalog-section-icon">${this._getCategoryIcon(cat)}</span>
-                            ${Components.escapeHtml(cat)}
-                            <span class="catalog-count">${booksInCat.length} ouvrage${booksInCat.length > 1 ? 's' : ''}</span>
-                        </h3>
+        grid.innerHTML = '';
+        if (available.length === 0) {
+            grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-secondary);">
+                <i class="fa-solid fa-book-open" style="font-size:40px;opacity:0.25;display:block;margin-bottom:12px;"></i>
+                ${q ? `Aucun livre disponible correspondant à "${Components.escapeHtml(q)}".` : 'Aucun livre disponible pour le moment.'}
+            </div>`;
+            return;
+        }
+
+        available.forEach(book => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;transition:all 0.2s ease;cursor:default;';
+
+            const coverHtml = book.image_url
+                ? `<img src="${Components.escapeHtml(book.image_url)}" alt="${Components.escapeHtml(book.title)}" style="width:100%;height:150px;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML='<div style=height:150px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:40px;color:var(--text-muted)><i class=fa-solid fa-book></i></div>'">`
+                : `<div style="height:150px;display:flex;align-items:center;justify-content:center;background:var(--bg-tertiary);font-size:40px;color:var(--text-muted);"><i class="fa-solid fa-book"></i></div>`;
+
+            card.innerHTML = `
+                ${coverHtml}
+                <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">
+                    <div style="font-size:10px;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
+                    <div style="font-weight:700;font-size:13px;line-height:1.35;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
+                    <div style="font-size:11px;color:var(--text-secondary);">par ${Components.escapeHtml(book.author)}</div>
+                    <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;">
+                        <span style="font-size:11px;color:#10b981;font-weight:600;"><i class="fa-solid fa-circle-check"></i> ${book.available_quantity} dispo.</span>
                     </div>
-                    <div class="catalog-grid" id="catalog-grid-${Components.escapeHtml(cat)}"></div>
-                </div>`;
-        });
+                </div>
+            `;
 
-        container.innerHTML = html;
+            // Hover effect
+            card.addEventListener('mouseenter', () => { card.style.borderColor = '#6366f1'; card.style.transform = 'translateY(-3px)'; card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.4)'; });
+            card.addEventListener('mouseleave', () => { card.style.borderColor = ''; card.style.transform = ''; card.style.boxShadow = ''; });
 
-        // Append book cards
-        sortedCats.forEach(cat => {
-            const booksInCat = categories[cat];
-            const grid = container.querySelector(`#catalog-grid-${CSS.escape(cat)}`);
-            if (grid) {
-                booksInCat.forEach(book => {
-                    grid.appendChild(Components.createBookCard(book));
-                });
-            }
+            grid.appendChild(card);
         });
     },
 

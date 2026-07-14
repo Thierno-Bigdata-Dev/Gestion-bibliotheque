@@ -307,6 +307,10 @@ class App {
         Components.showToast(`Demande de réservation enregistrée pour : "${title}".`, "success");
     }
 
+    filterMyLoans(filter) {
+        UI.renderMyLoans(UI._myLoansAll || [], filter);
+    }
+
     startAutoPolling() {
         // Poll every 10 seconds to update dashboard in real-time
         setInterval(() => this.loadAllData(), 10000);

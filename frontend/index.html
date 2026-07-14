@@ -543,88 +543,98 @@
                         </thead>
                         <tbody id="all-accounts-body">
                         </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Student Portal View -->
+                      <!-- Student / Teacher Portal -->
             <section id="tab-student-portal" class="tab-content" role="tabpanel">
-                <div class="student-portal-container">
-                    <div class="student-login-card">
-                        <h3>Portail Étudiant & Lecteur</h3>
-                        <p>Sélectionnez votre compte pour accéder à votre historique d'emprunts et voir vos informations.</p>
-                        <div class="form-group">
-                            <select id="student-select" class="form-control" style="width: 100%; max-width: 320px; margin: 0 auto; display: block; padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
-                                <option value="">-- Choisir un compte étudiant --</option>
-                            </select>
-                        </div>
+
+                <!-- Welcome Banner -->
+                <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;background:linear-gradient(135deg,rgba(99,102,241,0.12),rgba(139,92,246,0.08));border:1px solid rgba(99,102,241,0.2);border-radius:14px;padding:20px 24px;flex-wrap:wrap;">
+                    <div style="width:52px;height:52px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;flex-shrink:0;">
+                        <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
                     </div>
-                    
-                    <div id="student-profile-view" class="student-profile-view hidden">
-                        <!-- Profile Card -->
-                        <div class="dashboard-card" style="padding: 24px;">
-                            <div class="card-header" style="justify-content: flex-start; gap: 12px; margin-bottom: 20px;">
-                                <i class="fa-solid fa-id-card" style="font-size: 24px; color: #6366f1;"></i>
-                                <h2 style="margin:0;">Mon Profil</h2>
-                            </div>
-                            <div class="card-body">
-                                <div style="display:flex; flex-direction:column; gap:12px;">
-                                    <div>
-                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Nom Complet</strong>
-                                        <div id="stu-full-name" style="font-size:16px; font-weight:600; margin-top:2px;">-</div>
-                                    </div>
-                                    <div>
-                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Rôle</strong>
-                                        <div id="stu-role" style="font-size:14px; margin-top:2px;">-</div>
-                                    </div>
-                                    <div>
-                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Email</strong>
-                                        <div id="stu-email" style="font-size:14px; margin-top:2px;">-</div>
-                                    </div>
-                                    <div>
-                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">ID Unique</strong>
-                                        <div id="stu-id" style="font-size:14px; font-family:monospace; margin-top:2px;">-</div>
-                                    </div>
-                                    <div>
-                                        <strong style="color:var(--text-secondary); font-size:12px; text-transform:uppercase;">Membre depuis</strong>
-                                        <div id="stu-created" style="font-size:14px; margin-top:2px;">-</div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div style="flex:1;min-width:160px;">
+                        <h2 style="font-size:18px;font-weight:700;margin-bottom:2px;" id="portal-welcome-title">Mon Espace</h2>
+                        <p style="color:var(--text-secondary);font-size:13px;" id="portal-welcome-sub">Gérez vos emprunts et explorez les livres disponibles.</p>
+                    </div>
+                    <div style="display:flex;gap:24px;text-align:center;flex-shrink:0;">
+                        <div>
+                            <div style="font-size:24px;font-weight:800;color:#6366f1;" id="portal-stat-active">0</div>
+                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">En cours</div>
                         </div>
-                        
-                        <!-- Loans History Table -->
-                        <div class="dashboard-card" style="padding: 24px;">
-                            <div class="card-header" style="margin-bottom: 20px;">
-                                <h2 style="margin:0;">Historique de mes Emprunts</h2>
-                                <span class="badge" id="stu-loans-count">0 emprunts</span>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-container" style="max-height: 350px; overflow-y: auto;">
-                                    <table class="data-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Livre</th>
-                                                <th>Date d'emprunt</th>
-                                                <th>Date limite</th>
-                                                <th>Date de retour</th>
-                                                <th>Statut</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="stu-loans-list">
-                                            <!-- Loaded dynamically -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                        <div>
+                            <div style="font-size:24px;font-weight:800;color:#ef4444;" id="portal-stat-overdue">0</div>
+                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">En retard</div>
+                        </div>
+                        <div>
+                            <div style="font-size:24px;font-weight:800;color:#10b981;" id="portal-stat-returned">0</div>
+                            <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Retournés</div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Section 1 : Mes Emprunts -->
+                <div style="margin-bottom:40px;">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                        <div>
+                            <h2 style="font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <i class="fa-solid fa-handshake" style="color:#6366f1;" aria-hidden="true"></i>
+                                Mes Emprunts
+                                <span class="badge" id="my-loans-count" style="background:#6366f1;color:#fff;">0</span>
+                            </h2>
+                            <p style="color:var(--text-secondary);font-size:13px;">Livres actuellement empruntés et historique complet.</p>
+                        </div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="loans-filter-chips">
+                            <button class="btn btn-primary btn-sm" data-lfilter="all" onclick="window.App.filterMyLoans('all')">Tous</button>
+                            <button class="btn btn-secondary btn-sm" data-lfilter="active" onclick="window.App.filterMyLoans('active')">En cours</button>
+                            <button class="btn btn-secondary btn-sm" data-lfilter="overdue" onclick="window.App.filterMyLoans('overdue')">En retard</button>
+                            <button class="btn btn-secondary btn-sm" data-lfilter="returned" onclick="window.App.filterMyLoans('returned')">Retournés</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Livre</th>
+                                    <th>Emprunté le</th>
+                                    <th>Date limite</th>
+                                    <th>Retourné le</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="my-loans-list">
+                                <tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-secondary);">
+                                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size:24px;margin-bottom:12px;display:block;"></i>Chargement...
+                                </td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 2 : Livres Disponibles -->
+                <div>
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+                        <div>
+                            <h2 style="font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <i class="fa-solid fa-book-open" style="color:#10b981;" aria-hidden="true"></i>
+                                Livres Disponibles
+                                <span class="badge" id="available-books-count" style="background:#10b981;color:#fff;">0</span>
+                            </h2>
+                            <p style="color:var(--text-secondary);font-size:13px;">Ouvrages disponibles que vous pouvez emprunter.</p>
+                        </div>
+                        <div class="search-box" style="max-width:300px;">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <input type="text" id="search-available-books" placeholder="Rechercher…" autocomplete="off">
+                        </div>
+                    </div>
+                    <div id="available-books-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:18px;">
+                        <!-- filled dynamically -->
+                    </div>
+                </div>
+
             </section>
         </main>
     </div>
 
-    <!-- Modals Section (a11y: role dialog, aria-modal, focus trapping hooks) -->
+    <!-- Modals Section -->
 
     <!-- Book Modal (Add / Edit) -->
     <div id="modal-book" class="modal" role="dialog" aria-modal="true" aria-labelledby="book-modal-title" tabindex="-1">
