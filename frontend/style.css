@@ -2029,230 +2029,49 @@ input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus,
     outline-offset: 3px;
 }
 
+ 
+ / *   A c c e s s i b i l i t y   &   E d g e   C a s e s   U t i l s   * / 
+ . t e x t - t r u n c a t e   { 
+         w h i t e - s p a c e :   n o w r a p ; 
+         o v e r f l o w :   h i d d e n ; 
+         t e x t - o v e r f l o w :   e l l i p s i s ; 
+         m a x - w i d t h :   2 5 0 p x ; 
+         d i s p l a y :   i n l i n e - b l o c k ; 
+         v e r t i c a l - a l i g n :   m i d d l e ; 
+ } 
+ . t a b l e - r e s p o n s i v e   { 
+         o v e r f l o w - x :   a u t o ; 
+         - w e b k i t - o v e r f l o w - s c r o l l i n g :   t o u c h ; 
+         w i d t h :   1 0 0 % ; 
+ } 
+ @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   { 
+         . m o d a l - c o n t e n t   { 
+                 m a x - w i d t h :   9 5 v w   ! i m p o r t a n t ; 
+                 p a d d i n g :   1 6 p x ; 
+         } 
+         . t e x t - t r u n c a t e   { 
+                 m a x - w i d t h :   1 5 0 p x ; 
+         } 
+ } 
+ 
+ 
+ 
+ . t a b l e - c o n t a i n e r   { 
+         o v e r f l o w - x :   a u t o ; 
+         - w e b k i t - o v e r f l o w - s c r o l l i n g :   t o u c h ; 
+         w i d t h :   1 0 0 % ; 
+ } 
+ 
+ 
+ 
 
-/* Accessibility & Edge Cases Utils */
-.text-truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 250px;
-    display: inline-block;
-    vertical-align: middle;
-}
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
-@media (max-width: 768px) {
-    .modal-content {
-        max-width: 95vw !important;
-        padding: 16px;
-    }
-    .text-truncate {
-        max-width: 150px;
-    }
-}
-
-
-
-.table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    gap: 12px;
-    color: var(--text-primary);
-}
-
-.catalog-section-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--primary), #7c3aed);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    color: white;
-    flex-shrink: 0;
-}
-
-.catalog-count {
-    font-size: 0.8rem;
-    font-weight: 500;
-    background: rgba(99,102,241,0.12);
-    color: var(--primary);
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-left: 6px;
-}
-
-.catalog-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 20px;
-}
-
-.book-card {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-}
-
-.book-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.3);
-    border-color: var(--primary);
-}
-
-.book-card:focus {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-}
-
-.book-cover {
-    width: 100%;
-    height: 240px;
-    background: linear-gradient(135deg, #1e293b, #334155);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.25);
-    font-size: 3.5rem;
-    flex-shrink: 0;
-}
-
-.book-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.book-info {
-    padding: 16px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.book-category-label {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--primary);
-    margin-bottom: 6px;
-    font-weight: 700;
-}
-
-.book-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: var(--text-primary);
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.book-author {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin-bottom: 14px;
-}
-
-.book-action {
-    margin-top: auto;
-}
-
-@media (max-width: 600px) {
-    .catalog-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 14px;
-    }
-    .book-cover {
-        height: 180px;
-    }
-    #tab-catalog {
-        padding: 16px;
-    }
-}
-
-.btn-public-catalog {
-    margin-top: 32px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 12px 24px;
-    border-radius: var(--border-radius-md);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-    backdrop-filter: blur(4px);
-    width: 100%;
-    max-width: 280px;
-    font-family: inherit;
-    align-self: center;
-}
-
-.btn-public-catalog:hover {
-    background: rgba(255, 255, 255, 0.16);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.btn-public-catalog:active {
-    transform: translateY(0);
-}
-
-.btn-public-catalog:focus-visible {
-    outline: 3px solid rgba(255, 255, 255, 0.4);
-    outline-offset: 3px;
-}
-
-
-/* Accessibility & Edge Cases Utils */
-.text-truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 250px;
-    display: inline-block;
-    vertical-align: middle;
-}
-.table-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
-@media (max-width: 768px) {
-    .modal-content {
-        max-width: 95vw !important;
-        padding: 16px;
-    }
-    .text-truncate {
-        max-width: 150px;
-    }
-}
-
-
-
-.table-container {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-}
+ . m o b i l e - l o g o u t   { 
+         d i s p l a y :   n o n e ; 
+ } 
+ @ m e d i a   ( m a x - w i d t h :   7 6 8 p x )   { 
+         . m o b i l e - l o g o u t   { 
+                 d i s p l a y :   f l e x ; 
+         } 
+ } 
+  
+ 
