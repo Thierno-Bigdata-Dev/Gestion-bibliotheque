@@ -82,9 +82,7 @@ def create_book():
         isbn=data['isbn'],
         published_year=data.get('published_year'),
         quantity=qty,
-        available_quantity=qty,
-        category=data.get('category', 'Autre'),
-        image_url=data.get('image_url')
+        available_quantity=qty
     )
     
     db.session.add(book)
@@ -110,10 +108,6 @@ def update_book(book_id):
         book.author = data['author']
     if 'published_year' in data:
         book.published_year = data['published_year']
-    if 'category' in data:
-        book.category = data['category']
-    if 'image_url' in data:
-        book.image_url = data['image_url']
         
     # Gérer la mise à jour des quantités de manière cohérente
     if 'quantity' in data:

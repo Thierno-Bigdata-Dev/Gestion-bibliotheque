@@ -198,25 +198,6 @@ class App {
         UI.viewUserProfile(id);
     }
 
-    requireLoginToBorrow() {
-        Components.showToast("Veuillez vous connecter pour emprunter un livre.", "warning");
-        const selector = document.getElementById('portal-selector');
-        const appRoot = document.getElementById('app-root');
-        if (selector) selector.style.display = 'flex';
-        if (appRoot) appRoot.style.display = 'none';
-        
-        // Ensure form is visible
-        const loginContainer = document.querySelector('.auth-container');
-        if (loginContainer) {
-            loginContainer.scrollIntoView({ behavior: 'smooth' });
-            // Highlight it briefly
-            loginContainer.style.boxShadow = '0 0 0 4px var(--primary)';
-            setTimeout(() => {
-                loginContainer.style.boxShadow = 'none';
-            }, 2000);
-        }
-    }
-
     bindForms() {
         document.getElementById('form-book')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -227,10 +208,8 @@ class App {
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
                 isbn: document.getElementById('book-isbn').value,
-                published_year: document.getElementById('book-year').value,
-                quantity: document.getElementById('book-qty').value,
-                category: document.getElementById('book-category') ? document.getElementById('book-category').value : 'Autre',
-                image_url: document.getElementById('book-image-url') ? document.getElementById('book-image-url').value : ''
+                published_year: parseInt(document.getElementById('book-year').value),
+                quantity: parseInt(document.getElementById('book-qty').value)
             };
             try {
                 await ApiService.createBook(data);

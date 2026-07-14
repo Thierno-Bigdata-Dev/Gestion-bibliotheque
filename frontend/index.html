@@ -144,13 +144,10 @@
                         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
                         <span>Tableau de bord</span>
                     </li>
-                    <li class="menu-item admin-only" data-tab="books" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item" data-tab="books" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-book" aria-hidden="true"></i>
-                        <span>Livres</span>
-                    </li>
-                    <li class="menu-item public-only" data-tab="catalog" role="tab" aria-selected="false" tabindex="0">
-                        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-                        <span>Catalogue</span>
+                        <span class="admin-only">Livres</span>
+                        <span class="public-only">Catalogue</span>
                     </li>
                     <li class="menu-item admin-only" data-tab="users" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-users" aria-hidden="true"></i>
@@ -228,18 +225,6 @@
                     <i class="fa-solid fa-arrows-rotate"></i> Réessayer la connexion
                 </button>
             </div>
-
-            <!-- Public Catalog View -->
-            <section id="tab-catalog" class="tab-content" role="tabpanel" aria-labelledby="catalog-tab">
-                <div class="catalog-header" style="margin-bottom: 24px; text-align: center;">
-                    <h2 style="font-size: 2rem; margin-bottom: 8px;">Catalogue Numérique</h2>
-                    <p style="color: var(--text-secondary);">Découvrez notre collection d'ouvrages et réservez-les en ligne.</p>
-                </div>
-                
-                <div id="catalog-container">
-                    <!-- Loaded dynamically via JS -->
-                </div>
-            </section>
 
             <!-- Dashboard View -->
             <section id="tab-dashboard" class="tab-content active" role="tabpanel" aria-labelledby="dashboard-tab">
@@ -376,7 +361,6 @@
                                 <th>Titre</th>
                                 <th>Auteur</th>
                                 <th>ISBN</th>
-                                <th>Catégorie</th>
                                 <th>Année</th>
                                 <th>Stock Total</th>
                                 <th>Disponible</th>
@@ -674,19 +658,6 @@
                         <input type="number" id="book-qty" min="1" value="1" required aria-required="true" aria-describedby="book-qty-error">
                         <span class="error-message" id="book-qty-error">La quantité doit être supérieure ou égale à 1.</span>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="book-category">Catégorie</label>
-                    <select id="book-category" class="form-control" style="width: 100%; padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
-                        <option value="Informatique & Big Data">Informatique & Big Data</option>
-                        <option value="Marketing Digital">Marketing Digital</option>
-                        <option value="Littérature">Littérature</option>
-                        <option value="Autre">Autre</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="book-image-url">URL de l'image de couverture</label>
-                    <input type="url" id="book-image-url" placeholder="https://exemple.com/image.jpg">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-book')">Annuler</button>

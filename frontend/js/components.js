@@ -70,7 +70,6 @@ export const Components = {
             <td><strong>${this.escapeHtml(book.title)}</strong></td>
             <td>${this.escapeHtml(book.author)}</td>
             <td>${this.escapeHtml(book.isbn)}</td>
-            <td><span class="badge badge-primary">${this.escapeHtml(book.category || 'Autre')}</span></td>
             <td>${book.published_year || '-'}</td>
             <td>${book.quantity}</td>
             <td><span class="badge ${book.available_quantity > 0 ? 'badge-success' : 'badge-danger'}">${book.available_quantity}</span></td>
@@ -138,37 +137,6 @@ export const Components = {
             </td>
         `;
         return tr;
-    },
-
-    createBookCard(book) {
-        const div = document.createElement('div');
-        div.className = 'book-card';
-        div.tabIndex = 0;
-        
-        const imageUrl = book.image_url || '';
-        const category = book.category || 'Autre';
-        
-        let imageHtml = '';
-        if (imageUrl) {
-            imageHtml = `<img src="${this.escapeHtml(imageUrl)}" alt="Couverture de ${this.escapeHtml(book.title)}" class="book-cover" onerror="this.outerHTML='<div class=\\'book-cover\\'><i class=\\'fa-solid fa-book\\'></i></div>'">`;
-        } else {
-            imageHtml = `<div class="book-cover"><i class="fa-solid fa-book"></i></div>`;
-        }
-        
-        div.innerHTML = `
-            ${imageHtml}
-            <div class="book-info">
-                <div class="book-category-label">${this.escapeHtml(category)}</div>
-                <div class="book-title">${this.escapeHtml(book.title)}</div>
-                <div class="book-author">${this.escapeHtml(book.author)}</div>
-                <div class="book-action">
-                    <button class="btn btn-primary" style="width: 100%" onclick="window.App.requireLoginToBorrow()">
-                        <i class="fa-solid fa-bookmark"></i> Emprunter
-                    </button>
-                </div>
-            </div>
-        `;
-        return div;
     },
 
     // Utilities
