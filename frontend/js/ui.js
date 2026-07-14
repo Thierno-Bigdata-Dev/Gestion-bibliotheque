@@ -3,9 +3,9 @@
  * Manages DOM updates, modals, and user interactions.
  */
 
-import { appStore } from './store.js?v=15';
-import { Components } from './components.js?v=15';
-import { ApiService } from './api.js?v=15';
+import { appStore } from './store.js?v=16';
+import { Components } from './components.js?v=16';
+import { ApiService } from './api.js?v=16';
 
 export const UI = {
     init() {
@@ -191,7 +191,7 @@ export const UI = {
             let actions = '';
             if (role === 'admin') {
                 actions = `
-                    <button class="btn-icon btn-icon-danger" onclick="window.App.deleteBook(${book.id})" title="Supprimer">
+                    <button class="btn-icon btn-icon-danger" onclick="window.App.deleteBook(${book.id})" title="Supprimer" aria-label="Supprimer">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 `;
@@ -266,10 +266,10 @@ export const UI = {
 
         filtered.forEach(user => {
             const actions = `
-                <button class="btn-icon btn-icon-info" onclick="window.App.viewUserProfile(${user.id})" title="Voir le profil">
+                <button class="btn-icon btn-icon-info" onclick="window.App.viewUserProfile(${user.id})" title="Voir le profil" aria-label="Voir le profil">
                     <i class="fa-solid fa-eye"></i>
                 </button>
-                <button class="btn-icon btn-icon-danger" onclick="window.App.deleteUser(${user.id})" title="Supprimer">
+                <button class="btn-icon btn-icon-danger" onclick="window.App.deleteUser(${user.id})" title="Supprimer" aria-label="Supprimer">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             `;
@@ -302,19 +302,19 @@ export const UI = {
                 let actions = '';
                 if (loan.status === 'active') {
                     actions += `
-                        <button class="btn-icon btn-icon-success" onclick="window.App.returnLoan(${loan.id})" title="Restituer">
+                        <button class="btn-icon btn-icon-success" onclick="window.App.returnLoan(${loan.id})" title="Restituer" aria-label="Restituer">
                             <i class="fa-solid fa-check"></i>
                         </button>
-                        <button class="btn-icon btn-icon-info" onclick="window.App.renewLoan(${loan.id})" title="Renouveler (+15j)">
+                        <button class="btn-icon btn-icon-info" onclick="window.App.renewLoan(${loan.id})" title="Renouveler (+15j)" aria-label="Renouveler (+15j)">
                             <i class="fa-solid fa-calendar-plus"></i>
                         </button>
                     `;
                 } else if (loan.status === 'pending') {
                     actions += `
-                        <button class="btn-icon btn-icon-success" onclick="window.App.approveLoan(${loan.id})" title="Approuver l'emprunt">
+                        <button class="btn-icon btn-icon-success" onclick="window.App.approveLoan(${loan.id})" title="Approuver l'emprunt" aria-label="Approuver l'emprunt">
                             <i class="fa-solid fa-check"></i>
                         </button>
-                        <button class="btn-icon btn-icon-danger" onclick="window.App.rejectLoan(${loan.id})" title="Rejeter la demande">
+                        <button class="btn-icon btn-icon-danger" onclick="window.App.rejectLoan(${loan.id})" title="Rejeter la demande" aria-label="Rejeter la demande">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     `;
@@ -346,10 +346,10 @@ export const UI = {
 
                 let actions = '';
                 if (loan.status === 'active') {
-                    actions += `<button class="btn-icon btn-icon-success" onclick="window.App.returnLoan(${loan.id})" title="Restituer"><i class="fa-solid fa-check"></i></button>`;
+                    actions += `<button class="btn-icon btn-icon-success" onclick="window.App.returnLoan(${loan.id})" title="Restituer" aria-label="Restituer"><i class="fa-solid fa-check"></i></button>`;
                 } else if (loan.status === 'pending') {
-                    actions += `<button class="btn-icon btn-icon-success" onclick="window.App.approveLoan(${loan.id})" title="Approuver"><i class="fa-solid fa-check"></i></button>
-                                <button class="btn-icon btn-icon-danger" onclick="window.App.rejectLoan(${loan.id})" title="Rejeter"><i class="fa-solid fa-xmark"></i></button>`;
+                    actions += `<button class="btn-icon btn-icon-success" onclick="window.App.approveLoan(${loan.id})" title="Approuver" aria-label="Approuver"><i class="fa-solid fa-check"></i></button>
+                                <button class="btn-icon btn-icon-danger" onclick="window.App.rejectLoan(${loan.id})" title="Rejeter" aria-label="Rejeter"><i class="fa-solid fa-xmark"></i></button>`;
                 }
 
                 tr.innerHTML = `
@@ -420,10 +420,10 @@ export const UI = {
                     <td>${reqDate}</td>
                     <td>
                         <div style="display:flex; gap:6px;">
-                            <button class="btn btn-primary btn-sm" onclick="window.App.validateUser(${user.id})" title="Valider le compte">
+                            <button class="btn btn-primary btn-sm" onclick="window.App.validateUser(${user.id})" title="Valider le compte" aria-label="Valider le compte">
                                 <i class="fa-solid fa-check"></i> Valider
                             </button>
-                            <button class="btn btn-secondary btn-sm" onclick="window.App.rejectUser(${user.id})" style="background:#ef4444;border-color:#ef4444;color:white;" title="Rejeter la demande">
+                            <button class="btn btn-secondary btn-sm" onclick="window.App.rejectUser(${user.id})" style="background:#ef4444;border-color:#ef4444;color:white;" title="Rejeter la demande" aria-label="Rejeter la demande">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
@@ -456,13 +456,13 @@ export const UI = {
                 let actions = '';
                 if (user.id !== appStore.getState('currentUser')?.id) {
                     if (user.status === 'EN_ATTENTE') {
-                        actions = `<button class="btn-icon btn-icon-success" onclick="window.App.validateUser(${user.id})" title="Valider"><i class="fa-solid fa-check"></i></button>`;
+                        actions = `<button class="btn-icon btn-icon-success" onclick="window.App.validateUser(${user.id})" title="Valider" aria-label="Valider"><i class="fa-solid fa-check"></i></button>`;
                     } else if (user.status === 'ACTIF') {
-                        actions = `<button class="btn-icon btn-icon-danger" onclick="window.App.suspendUser(${user.id})" title="Suspendre"><i class="fa-solid fa-ban"></i></button>`;
+                        actions = `<button class="btn-icon btn-icon-danger" onclick="window.App.suspendUser(${user.id})" title="Suspendre" aria-label="Suspendre"><i class="fa-solid fa-ban"></i></button>`;
                     } else if (user.status === 'SUSPENDU') {
-                        actions = `<button class="btn-icon btn-icon-success" onclick="window.App.validateUser(${user.id})" title="Réactiver"><i class="fa-solid fa-play"></i></button>`;
+                        actions = `<button class="btn-icon btn-icon-success" onclick="window.App.validateUser(${user.id})" title="Réactiver" aria-label="Réactiver"><i class="fa-solid fa-play"></i></button>`;
                     }
-                    actions += `<button class="btn-icon btn-icon-danger" onclick="window.App.deleteUser(${user.id})" title="Supprimer"><i class="fa-solid fa-trash"></i></button>`;
+                    actions += `<button class="btn-icon btn-icon-danger" onclick="window.App.deleteUser(${user.id})" title="Supprimer" aria-label="Supprimer"><i class="fa-solid fa-trash"></i></button>`;
                 }
                 
                 tr.innerHTML = `
@@ -608,7 +608,11 @@ export const UI = {
         const listEl = document.getElementById('prof-loans-list');
         listEl.innerHTML = '';
         if (loans.length === 0) {
-            listEl.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucun emprunt enregistré.</td></tr>';
+            listEl.innerHTML = Components.getEmptyStateHTML(
+                "Aucun emprunt", 
+                "Cet utilisateur n'a aucun emprunt en cours ou passé.", 
+                "fa-book-open"
+            );
         } else {
             loans.forEach(loan => {
                 const bookTitle = loan.book ? loan.book.title : `Livre #${loan.book_id}`;
@@ -856,9 +860,12 @@ export const UI = {
                 overdue:  'Aucun emprunt en retard. 🎉',
                 returned: 'Aucun livre retourné.',
             };
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:48px;color:var(--text-secondary);">
-                <i class="fa-solid fa-handshake" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px;"></i>
-                ${msgs[filter] || msgs.all}</td></tr>`;
+            tbody.innerHTML = Components.getEmptyStateHTML(
+                "Aucun emprunt",
+                msgs[filter] || msgs.all,
+                "fa-handshake",
+                filter === 'all' || filter === 'active' ? `<button class="btn btn-primary" onclick="window.App.switchTab('student-portal')">Découvrir le catalogue</button>` : ''
+            );
             return;
         }
 
@@ -926,8 +933,8 @@ export const UI = {
                 ${coverHtml}
                 <div style="padding:12px;flex:1;display:flex;flex-direction:column;gap:4px;">
                     <div style="font-size:10px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:0.5px;">${Components.escapeHtml(book.category || 'Autre')}</div>
-                    <div style="font-weight:700;font-size:14px;color:#f8fafc;line-height:1.3;margin-bottom:2px;" title="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
-                    <div style="font-size:11px;color:#94a3b8;">par ${Components.escapeHtml(book.author)}</div>
+                    <div class="text-truncate" style="font-weight:700;font-size:14px;color:#f8fafc;line-height:1.3;margin-bottom:2px;max-width:100%;" title="${Components.escapeHtml(book.title)}" aria-label="${Components.escapeHtml(book.title)}">${Components.escapeHtml(book.title)}</div>
+                    <div class="text-truncate" style="font-size:11px;color:#94a3b8;max-width:100%;" title="${Components.escapeHtml(book.author)}" aria-label="${Components.escapeHtml(book.author)}">par ${Components.escapeHtml(book.author)}</div>
                     <div style="font-size:10px;color:#475569;font-family:monospace;">${Components.escapeHtml(book.isbn || 'N/A')}</div>
                     <div style="margin-top:auto;padding-top:12px;">
                         <button onclick="window.App.borrowBook(${book.id})" style="width:100%;background:#8b5cf6;color:white;border:none;padding:8px;border-radius:6px;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#7c3aed'" onmouseout="this.style.background='#8b5cf6'">

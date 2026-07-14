@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Data Viz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
     <!-- Accessibility Live Region -->
@@ -143,28 +143,28 @@
             
             <nav class="sidebar-menu" role="navigation">
                 <ul>
-                    <li class="menu-item active admin-only" data-tab="dashboard" data-title="Tableau de Bord" data-subtitle="Aperçu général des statistiques et activités" role="tab" aria-selected="true" tabindex="0">
+                    <li class="menu-item active admin-only" data-tab="dashboard" data-title="Tableau de Bord" aria-label="Tableau de Bord" data-subtitle="Aperçu général des statistiques et activités" aria-label="Aperçu général des statistiques et activités" role="tab" aria-selected="true" tabindex="0">
                         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
                         <span>Tableau de bord</span>
                     </li>
-                    <li class="menu-item admin-only" data-tab="books" data-title="Gestion des Livres" data-subtitle="Catalogue complet et inventaire" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item admin-only" data-tab="books" data-title="Gestion des Livres" aria-label="Gestion des Livres" data-subtitle="Catalogue complet et inventaire" aria-label="Catalogue complet et inventaire" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-book" aria-hidden="true"></i>
                         <span>Livres</span>
                     </li>
-                    <li class="menu-item admin-only" data-tab="users" data-title="Utilisateurs" data-subtitle="Gestion des étudiants et enseignants" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item admin-only" data-tab="users" data-title="Utilisateurs" aria-label="Utilisateurs" data-subtitle="Gestion des étudiants et enseignants" aria-label="Gestion des étudiants et enseignants" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-users" aria-hidden="true"></i>
                         <span>Utilisateurs</span>
                     </li>
-                    <li class="menu-item admin-only" data-tab="loans" data-title="Emprunts en cours" data-subtitle="Suivi des prêts et retours" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item admin-only" data-tab="loans" data-title="Emprunts en cours" aria-label="Emprunts en cours" data-subtitle="Suivi des prêts et retours" aria-label="Suivi des prêts et retours" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-handshake" aria-hidden="true"></i>
                         <span>Emprunts</span>
                     </li>
-                    <li class="menu-item admin-only" data-tab="pending" data-title="Validations de Comptes" data-subtitle="Demandes d'inscription en attente" role="tab" aria-selected="false" tabindex="0" id="menu-pending">
+                    <li class="menu-item admin-only" data-tab="pending" data-title="Validations de Comptes" aria-label="Validations de Comptes" data-subtitle="Demandes d'inscription en attente" aria-label="Demandes d'inscription en attente" role="tab" aria-selected="false" tabindex="0" id="menu-pending">
                         <i class="fa-solid fa-user-clock" aria-hidden="true"></i>
                         <span>Validations</span>
                         <span class="pending-badge" id="pending-count-badge" style="display:none">0</span>
                     </li>
-                    <li class="menu-item public-only" data-tab="student-portal" data-title="Portail Étudiant" data-subtitle="Consultez le catalogue et gérez vos emprunts" role="tab" aria-selected="false" tabindex="0">
+                    <li class="menu-item public-only" data-tab="student-portal" data-title="Portail Étudiant" aria-label="Portail Étudiant" data-subtitle="Consultez le catalogue et gérez vos emprunts" aria-label="Consultez le catalogue et gérez vos emprunts" role="tab" aria-selected="false" tabindex="0">
                         <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
                         <span>Mon Espace</span>
                     </li>
@@ -459,7 +459,7 @@
                         <h2>Validations de comptes</h2>
                         <p class="section-subtitle">Comptes en attente de validation administrateur</p>
                     </div>
-                    <button class="btn-action btn-refresh" onclick="loadAllData()" title="Actualiser">
+                    <button class="btn-action btn-refresh" onclick="loadAllData()" title="Actualiser" aria-label="Actualiser">
                         <i class="fa-solid fa-rotate"></i> Actualiser
                     </button>
                 </div>
@@ -874,6 +874,6 @@
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
     
     <!-- JS App Logic -->
-    <script type="module" src="js/main.js?v=15"></script>
+    <script type="module" src="js/main.js?v=16"></script>
 </body>
 </html>
