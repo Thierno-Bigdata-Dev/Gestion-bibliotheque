@@ -20,36 +20,48 @@ class App {
     }
 
     async loadAllData() {
+        const role = appStore.getState('userRole');
+        const user = appStore.getState('currentUser');
+
+        // ── STUDENT / TEACHER ──────────────────────────────────────────
+        // Only loads: books (to show available) + their own loans
+        // Admin data (all users, all loans) is NEVER loaded for public users
+        if (role === 'public' && user) {
+            appStore.setState('isLoading', true);
+            try {
+                appStore.setState('isOffline', false);
+                const [books, myLoans] = await Promise.all([
+                    ApiService.getBooks(),
+                    ApiService.getLoansByUser(user.id)
+                ]);
+                appStore.setState('books', books);
+                // Store user loans under a separate key to avoid mixing with admin loans
+                appStore.setState('userLoans', myLoans);
+            } catch (error) {
+                console.error(error);
+                appStore.setState('isOffline', true);
+                Components.showToast("Erreur de connexion avec le serveur.", "danger");
+            } finally {
+                appStore.setState('isLoading', false);
+            }
+            return;
+        }
+
+        // ── ADMIN ──────────────────────────────────────────────────────
+        // Loads everything
         appStore.setState('isLoading', true);
         try {
             appStore.setState('isOffline', false);
-            
-            // Promise.all for parallel fetching
-            const role = appStore.getState('userRole');
-            
-            const promises = [
+            const [books, users, loans, allUsers] = await Promise.all([
                 ApiService.getBooks(),
                 ApiService.getUsers(),
-                ApiService.getLoans()
-            ];
-            
-            if (role === 'admin') {
-                promises.push(ApiService.getAllUsers());
-            }
-            
-            const results = await Promise.all(promises);
-            const books = results[0];
-            const users = results[1];
-            const loans = results[2];
-            
-            appStore.setState('books', books);
-            appStore.setState('users', users);
-            appStore.setState('loans', loans);
-            
-            if (role === 'admin') {
-                appStore.setState('allUsers', results[3]);
-            }
-            
+                ApiService.getLoans(),
+                role === 'admin' ? ApiService.getAllUsers() : Promise.resolve([])
+            ]);
+            appStore.setState('books',    books);
+            appStore.setState('users',    users);
+            appStore.setState('loans',    loans);
+            if (role === 'admin') appStore.setState('allUsers', allUsers);
         } catch (error) {
             console.error(error);
             appStore.setState('isOffline', true);

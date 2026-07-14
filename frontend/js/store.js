@@ -10,6 +10,8 @@ class Store {
             users: [],
             allUsers: [],
             loans: [],
+            userLoans: [],       // student/teacher-scoped loans (never mixed with admin loans)
+
             isOffline: false,
             isLoading: true,
             activeTab: sessionStorage.getItem('activeTab') || 'dashboard',

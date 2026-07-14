@@ -142,6 +142,9 @@ export const ApiService = {
     async getLoans() {
         return this.request(API_URLS.loans);
     },
+    async getLoansByUser(userId) {
+        return this.request(`${API_URLS.loans}/user/${userId}`);
+    },
     async createLoan(data) {
         return this.request(API_URLS.loans, { method: 'POST', body: JSON.stringify(data) });
     },

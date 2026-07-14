@@ -32,6 +32,13 @@ export const UI = {
                 this.renderMyLoans(loans);
             }
         });
+        appStore.subscribe('userLoans', userLoans => {
+            // Only relevant in public (student/teacher) mode
+            if (appStore.getState('userRole') === 'public') {
+                UI._myLoansAll = userLoans || [];
+                UI.renderMyLoans(userLoans || []);
+            }
+        });
         appStore.subscribe('userRole', role => {
             this.handleRoleChange(role);
             if (role === 'public') {
@@ -644,33 +651,19 @@ export const UI = {
         } else {
             if (selector) selector.style.display = 'none';
             if (appRoot) appRoot.style.display = 'flex';
-            
+
             document.body.classList.remove('mode-public', 'mode-admin');
             document.body.classList.add(`mode-${role}`);
-            
+
+            // Redirect to correct default tab
             const currentTab = appStore.getState('activeTab');
             if (role === 'public' && (currentTab === 'dashboard' || currentTab === 'users' || currentTab === 'loans' || currentTab === 'books' || currentTab === 'catalog')) {
                 appStore.setState('activeTab', 'student-portal');
             } else if (role === 'admin' && (currentTab === 'student-portal' || currentTab === 'catalog')) {
                 appStore.setState('activeTab', 'dashboard');
             }
-            
+
             this.renderBooks(appStore.getState('books'));
-            
-            if (role === 'public') {
-                this.populateStudentDropdown(appStore.getState('users'));
-                const activeStudentId = appStore.getState('activeStudentId');
-                if (activeStudentId) {
-                    this.renderStudentProfile(activeStudentId);
-                } else {
-                    const profileView = document.getElementById('student-profile-view');
-                    if (profileView) profileView.classList.add('hidden');
-                    const studentSelect = document.getElementById('student-select');
-                    if (studentSelect) studentSelect.value = '';
-                    const footerName = document.getElementById('active-student-name');
-                    if (footerName) footerName.textContent = 'Lecteur Public';
-                }
-            }
         }
     },
 
@@ -754,9 +747,9 @@ export const UI = {
     // Student / Teacher Portal
     // -----------------------------------------------
     renderStudentPortal() {
-        const user  = appStore.getState('currentUser');
-        const loans = appStore.getState('loans') || [];
-        const books = appStore.getState('books') || [];
+        const user     = appStore.getState('currentUser');
+        const myLoans  = appStore.getState('userLoans') || [];
+        const books    = appStore.getState('books') || [];
 
         // Update welcome banner
         if (user) {
@@ -766,12 +759,7 @@ export const UI = {
             if (subEl)   subEl.textContent   = `${user.role} — ${user.email}`;
         }
 
-        // My loans (filter by current user id)
-        const myLoans = user
-            ? loans.filter(l => l.user_id === user.id || l.user?.id === user.id)
-            : [];
-
-        this._myLoansAll = myLoans;
+        this._myLoansAll    = myLoans;
         this._myLoansFilter = this._myLoansFilter || 'all';
         this.renderMyLoans(myLoans);
 
