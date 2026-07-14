@@ -3,11 +3,11 @@
  * Bootstraps the application, links UI and API, and exposes global methods for inline HTML events.
  */
 
-import { ApiService } from './api.js?v=14';
-import { appStore } from './store.js?v=14';
-import { UI } from './ui.js?v=14';
-import { Components } from './components.js?v=14';
-import { AuthUI } from './auth.js?v=14';
+import { ApiService } from './api.js?v=15';
+import { appStore } from './store.js?v=15';
+import { UI } from './ui.js?v=15';
+import { Components } from './components.js?v=15';
+import { AuthUI } from './auth.js?v=15';
 
 class App {
     async init() {
@@ -269,6 +269,23 @@ class App {
             const btn = e.target.querySelector('button[type="submit"]');
             if (btn) { btn.classList.add('is-loading'); btn.disabled = true; }
             
+            let imageUrl = document.getElementById('book-image-url') ? document.getElementById('book-image-url').value : '';
+            const fileInput = document.getElementById('book-image-file');
+            
+            if (fileInput && fileInput.files.length > 0) {
+                try {
+                    const file = fileInput.files[0];
+                    imageUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => resolve(ev.target.result);
+                        reader.onerror = (err) => reject(err);
+                        reader.readAsDataURL(file);
+                    });
+                } catch (e) {
+                    console.error("Failed to read file", e);
+                }
+            }
+
             const data = {
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
@@ -276,7 +293,7 @@ class App {
                 published_year: document.getElementById('book-year').value,
                 quantity: document.getElementById('book-qty').value,
                 category: document.getElementById('book-category') ? document.getElementById('book-category').value : 'Autre',
-                image_url: document.getElementById('book-image-url') ? document.getElementById('book-image-url').value : ''
+                image_url: imageUrl
             };
             try {
                 await ApiService.createBook(data);

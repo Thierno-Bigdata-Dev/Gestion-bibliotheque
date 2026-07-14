@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js for Data Viz -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css?v=14">
+    <link rel="stylesheet" href="style.css?v=15">
 </head>
 <body>
     <!-- Accessibility Live Region -->
@@ -694,6 +694,10 @@
                     <label for="book-image-url">URL de l'image de couverture</label>
                     <input type="url" id="book-image-url" placeholder="https://exemple.com/image.jpg">
                 </div>
+                <div class="form-group">
+                    <label for="book-image-file">Ou importer une image</label>
+                    <input type="file" id="book-image-file" accept="image/*" style="padding: 8px; font-size: 14px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-book')">Annuler</button>
                     <button type="submit" class="btn btn-primary" id="btn-submit-book">Enregistrer</button>
@@ -870,6 +874,6 @@
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
     
     <!-- JS App Logic -->
-    <script type="module" src="js/main.js?v=14"></script>
+    <script type="module" src="js/main.js?v=15"></script>
 </body>
 </html>
